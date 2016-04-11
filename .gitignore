@@ -1,0 +1,15 @@
+# The database need not be updated.
+DATABASE/*
+
+# Things explicitly not to include
+not_in_git/*
+
+# PyCharm directories
+**/__pycache__/*
+.idea/*
+
+# Files nobody else wants
+.DS_Store
+*~
+\#*#
+*.command

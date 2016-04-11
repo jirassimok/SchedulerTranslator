@@ -1,0 +1,306 @@
+/** Add css rules here for your application. */
+/** Example rules used by the template application (remove for your app) */
+h1 {
+	font-size: 2em;
+	font-weight: bold;
+	color: #777777;
+	margin: 40px 0px 70px;
+	text-align: center;
+}
+
+.sched-TopButtonSelected {
+	background-color: #c41230;
+	color: white;
+	box-shadow: inset -20px 0px 10px -10px white;
+}
+
+.sched-TopButton:enabled {
+	background-color: #c41230;
+	color: black;
+	box-shadow: inset -10px 0px 10px -10px black;
+}
+
+.sched-TopButton:disabled {
+	background-color: #A9B0B7;
+	color: gray;
+	box-shadow: inset -10px 0px 10px -10px gray;
+}
+
+.sched-TopButton, .sched-TopButtonSelected {
+	font-size: 20px;
+	left: 50px;
+	position: relative;
+	margin: 0px 50px 0px -100px;
+	padding: 0px 75px;
+	text-decoration: none;
+	cursor: pointer;
+	cursor: hand;
+	border: 0px solid #bbb;
+	border-left: 0px;
+	border-bottom: 0px;
+	border-top: 0px;
+	border-radius: 0px 75px 0px 0px;
+}
+
+.sched-TopButton:enabled:hover {
+	background-color: #e62341;
+}
+
+
+.sendButton {
+	display: block;
+	font-size: 16pt;
+}
+
+.sched-Button {
+  margin: 0;
+  padding: 3px 5px 3px 5px;
+  text-decoration: none;
+  cursor: pointer;
+  cursor: hand;
+  font-size:small;
+  background: url("scheduler/gwt/clean/images/hborder.png") repeat-x 0px -2077px;
+  border:1px solid #bbb;
+  border-bottom: 1px solid #a0a0a0;
+  border-radius: 3px;
+ -moz-border-radius: 3px;
+}
+
+/** Most GWT widgets already have a style name defined */
+.gwt-DialogBox {
+	width: 400px;
+}
+
+.dialogVPanel {
+	margin: 5px;
+}
+
+.serverResponseLabelError {
+	color: red;
+}
+
+/** Set ids using widget.getElement().setId("idOfElement") */
+#closeButton {
+	margin: 15px 6px 6px;
+}
+
+.courseList {
+	width: 100%;
+	border-spacing: 0px;
+}
+
+.courseList>tr:nth-child(even) {
+	background: #F3F7FB;
+}
+
+.courseList>tr:nth-child(odd) {
+	background: #FFF;
+}
+
+.courseList>tr:hover {
+	background: #EEE;
+}
+
+.courseList td {
+	padding: 3px;
+}
+
+.termView div {
+	margin: 2px;
+	padding: 2px;
+	display: inline;
+	border-color: grey;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 10px;
+}
+
+.permutationCourseItem {
+	border-width: 0px 0px 1px 0px;
+	border-color: black;
+	border-style: solid;
+	width: 100%;
+}
+
+.permutationPeriodItem {
+	border-color: grey;
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 10px;
+	overflow: hidden;
+	text-align: center;
+	display: table-cell;
+	vertical-align: middle;
+	width: 100%;
+	left: 0px;
+	cursor: pointer;
+}
+
+.permutationCanvas {
+	border-radius: 10px;
+	border: 2px #CCCCCC solid;
+	cursor: pointer;
+}
+
+.permutationHourMarker {
+	border-bottom: 1px dotted #ddd;
+	border-top: 1px solid #ddd;
+	width: 100%;
+}
+
+.permutationHourLabel {
+	border: 1px solid #ddd;
+	font-size: smaller;
+	overflow: hidden;
+}
+
+.courseItemPeriods {
+	
+}
+
+.courseItemPeriods>div:hover {
+	background: #F3F7FB;
+}
+
+.PeriodSelectProf {
+	float: right;
+	cursor: pointer;
+	content: 'test';
+}
+
+.PeriodSelectProf:hover {
+	content: 'test';
+}
+
+.ScheduleLoadingLabel {
+	width: 30%;
+	border-radius: 12px;
+	border: 1px solid #CCCCCC;
+	font-size: 40px;
+	position: absolute;
+	z-index: 2;
+	background-color: #FFFFFF;
+	opacity: 0.95;
+}
+
+.ConflictResolverItem {
+	border: 1px solid #BBBBBB;
+	border-radius: 10px;
+	padding: 4px;
+	margin: 4px;
+}
+
+.DetailedSection {
+	border: 1px solid #BBBBBB;
+	border-radius: 10px;
+	padding: 4px;
+	width: 100%;
+}
+
+.TimeTable {
+	font-size: 0px;
+	border-width: 2px;
+	border-style: solid;
+	border-color: black;
+	border-spacing: 0;
+	border-collapse: collapse;
+	/**display:inline;*/
+}
+
+.TimeTable_Row {
+	font-size: 0px;
+	vertical-align: top;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.TimeTable_TermLabel {
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: top;
+	display: inline-block; *
+	display: inline;
+	zoom: 1;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.TimeTable_DayLabels {
+	font-size: 9px;
+	text-align: center;
+	vertical-align: top;
+	display: inline-block; *
+	display: inline;
+	zoom: 1;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.TimeTable_HourLabels {
+	font-size: 9px;
+	text-align: left;
+	vertical-align: top;
+	display: inline-block; *
+	display: inline;
+	zoom: 1;
+	border-right-width: 1px;
+	border-top-width: 1px;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.TimeTable_Cell {
+	font-size: 0px;
+	border-right-width: 1px;
+	border-top-width: 1px;
+	vertical-align: top;
+	display: inline-block; *
+	display: inline;
+	zoom: 1;
+}
+
+.TimeTable_Cell_Static {
+	border-right-style: solid;
+	border-color: black;
+}
+
+.TimeTable_Cell_Selected {
+	background-color: #339900;
+	border-right-style: solid;
+	border-top-style: solid;
+	border-color: #339900;
+}
+
+.TimeTable_Cell_Deselected {
+	background-color: #FFDEDE;
+	border-right-style: solid;
+	border-top-style: solid;
+	border-color: #FFDEDE;
+}
+
+.TimeTable_Cell_Even {
+	border-top-style: solid;
+	border-color: black;
+}
+
+.TimeTable_Cell_Odd {
+	border-top-style: dotted;
+	border-color: black;
+}
