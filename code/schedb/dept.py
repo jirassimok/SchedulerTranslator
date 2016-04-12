@@ -41,3 +41,14 @@ class Dept(object):
         course.parse_self(json)
         course.parse_sections(json)
         self.courses.append(course)
+
+    def semiobs_add_course(self, course):
+        # if course not in self.courses:  # seems to check with ==
+        #     self.courses.append(course)
+        # else:
+        for c in self.courses:
+            if c==course and c.islabs==course.islabs:
+                c.sections.extend(course.sections)
+                break  # No need to go on after adding the course.
+        else:  # If the course/labs was not found.
+            self.courses.append(course)

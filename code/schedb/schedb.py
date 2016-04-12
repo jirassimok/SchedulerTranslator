@@ -67,23 +67,25 @@ class Schedb(object):
         :param courses: The course list to add.
         """
         self.departments[dept].add_courses(courses)
+        # That functon is not yet implemented.
 
     # noinspection PyIncorrectDocstring
     def obs_addcourse(self, course, dept_abbrev, dept_name):
         """Adds a regblocks xml to the stated department.
         If the department is not present, adds it.
         Obsolete."""
-        self.departments.setdefault(dept_abbrev, Dept(dept_abbrev, dept_name)
-                                    ).courses.append(course)
+        self.departments.setdefault(dept_abbrev, Dept(dept_abbrev, dept_name))
+        self.departments[dept_abbrev].semiobs_add_course(course)
 
     # noinspection PyIncorrectDocstring
-    def obs_convert_rb_json(self, json):
+    def obs_convert_rb_json(self, json, *, islabs=False):
         """Converts a regblocks json to xml and adds the course.
         Obsolete."""
         s1 = json["sections"][0]
         dept_abbrev = s1["subject"]
         dept_name = s1["department"]
-        self.obs_addcourse(parser.parse_course(json), dept_abbrev, dept_name)
+        course = parser.parse_course(json, islabs=islabs)
+        self.obs_addcourse(course, dept_abbrev, dept_name)
 
     # noinspection PyIncorrectDocstring
     def obs_convert_list_of_rb_jsons(self, jsonlist):
@@ -91,3 +93,4 @@ class Schedb(object):
         Obsolete."""
         for json in jsonlist:
             self.obs_convert_rb_json(json)
+            self.obs_convert_rb_json(json, islabs=True)

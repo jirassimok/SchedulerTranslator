@@ -8,28 +8,35 @@ Running this file will read all departments and courses in the local database
 (which must be running on port 8000) to a schedb, and print all the departments
 and regblocks in to ../io/regblockslist.json, then read that and write a schedb
 to ../io/new_v1.1.schedb.
+
 """
+# Imports from libraries.
+import sys
+# Imports from project.
 from schedb.schedb import Schedb
-from json_fetcher import Fetch
-# from tdbbuild import term_write_loop  # Only needed to be run once for now.
-import obsolete_partial_parse
+from fetch import Fetch
+from tdbbuild import term_write_loop  # Only needed to be run once for now.
+import partial_parse
+import hostdb
 
-BUILDING_JSON = False
-BUILDING_SCHEDB = True
+""" RUN_MODE determines what this program will do. Possible values are:
+get - Saves data from a web database to the local database.
+parse - Parses data from the local database to a schedb.
+"""
 
-INPUT_FILE = "../io/regblockslist.json"
-OUTPUT_FILE = "../io/new_v1.1.schedb"
+if len(sys.argv)>1:  # If command line arguments found...
+    RUN_MODE = sys.argv[1]
+else:
+    RUN_MODE = "unspecified"
 
-PICKLE = True
-PICKLE_FILE = "FILE_SHOULD_NOT_EXIST_PLEASE_DELETE"
-if PICKLE:
-    import pickle
-    PICKLE_FILE = "../io/schedb.pickle"
+JSON_FILE = "../io/regblockslist.json"
+SCHEDB_FILE = "../io/new_v1.1.schedb"
+
 
 # TODO: Create a set of classes to represent the json structure.
 # Using algorithms similar to the web->file database reader,
 # Make a web->object database reader.
-# TODO: Then pass a schedjson to the schedb to parse.
+# TODO: Then pass a schedbparse to the schedb to parse.
 # TODO: Fix labs/conferences AFTER classes get me easy access to all the data.
 
 # TODO: MAJOR ISSUES: Can't parse anything including "null". (explicitly)
@@ -91,34 +98,60 @@ course: schedb has min-/max-credits and grade-type
 section: lots
 
 '''
+if RUN_MODE == "get":
+    # Setup for pager
+    READING_DATABASE = True  # Should always be true as of 2016-04-12
+    DATABASE_IS_LOCAL = False
+
+    # Setup for database retrieval
+    WRITING_LOCAL_DATABASE = True
+
+    # Setup for file-reading/writing
+    BUILDING_JSON = False
+    BUILDING_SCHEDB = False
+elif RUN_MODE == "parse":
+    READING_DATABASE = True  # Should always be true as of 2016-04-12
+    DATABASE_IS_LOCAL = True
+
+    WRITING_LOCAL_DATABASE = True
+
+    BUILDING_JSON = True
+    BUILDING_SCHEDB = True
+elif RUN_MODE == "unspecified":
+    raise Exception('No run mode specified.')
+else:
+    raise Exception('Invalid run mode: "' + RUN_MODE + '"')
+
+
 
 schedb = Schedb()
-pager = Fetch(local=False)  # readfile=None
-print("Pager initialized")
-# pager.set_terms("Fall%202016")
-pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
+if READING_DATABASE:
+    pager = Fetch(local=DATABASE_IS_LOCAL)  # readfile=None
+    print("Pager initialized")
+    # pager.set_terms("Fall%202016")
+    pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
+    if DATABASE_IS_LOCAL:
+        hostdb.run_database_server()
 
 
-def get_and_list_depts(schedb, pager):
-    depts = pager.get_json(pager.term)
-    schedb.add_depts(depts)
-    for d, D in schedb.departments.items():
+def get_and_list_depts(_schedb, _pager):
+    depts = _pager.get_json(pager.term)
+    _schedb.add_depts(depts)
+    for d, D in _schedb.departments.items():
         print(d, "\t", D.abbrev, "\t", D.name, sep='')
 
 
-if BUILDING_JSON:
-    obsolete_partial_parse.concatenate_regblocks(pager, INPUT_FILE)
+if READING_DATABASE and BUILDING_JSON:
+    partial_parse.concatenate_regblocks(pager, JSON_FILE)
 if BUILDING_SCHEDB:
-    obsolete_partial_parse.obs_main_populate_schedb(
-        schedb, INPUT_FILE, OUTPUT_FILE)
+    partial_parse.obs_main_populate_schedb(
+        schedb, JSON_FILE, SCHEDB_FILE)
 
-if PICKLE:
-    # Save the object for no particular reason. The file must already exist.
-    with open(PICKLE_FILE, "wb") as pfile:
-        pickle.dump(schedb, pfile)
+if READING_DATABASE and WRITING_LOCAL_DATABASE:  # Read the external database,
+    term_write_loop(pager, prompt=False)  # and write it to the local database.
 
-
-
+if READING_DATABASE and DATABASE_IS_LOCAL:
+    hostdb.close_database_server()  # Stop the database server.
 
 '''# This is the code I'm currently working on.
 
@@ -131,6 +164,3 @@ for dept in depts:
     coursnums = [course["number"] for course in courses]
     # Do a hell of a lot more in this loop - quite possible everything?
 #'''
-
-
-

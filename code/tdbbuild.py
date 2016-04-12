@@ -7,7 +7,6 @@ Date: 2016-04-10
 Function for easier construction of test database.s
 """
 import os
-import os.path as path
 from utility import print_now
 
 # The filename of the local database's directory relative to this directory.
@@ -33,12 +32,13 @@ def set_dir():
         raise err
 
 
-def get_coursenums(fetch, dept):
+def get_coursenums(fetch, term, dept):
     """ Returns a list of the course numbers for the given department.
     :param fetch: The Fetch object to use to get the course numbers.
+    :param term: The term to get course numbers during.
     :param dept: The department to list courses for.
     """
-    courses = fetch.get_json(fetch.term, dept)
+    courses = fetch.get_json(term, dept)
     return [course["number"] for course in courses]
 
 
@@ -62,17 +62,17 @@ def write_page(fetch, term, dept=None, num=None, regblock=None,
     filepath = LOCAL_DATABASE + term.replace("%20", " ") + "/subjects"
     if dept:
         filepath += "/" + dept + "/courses"
-        if not path.exists(filepath):
+        if not os.path.exists(filepath):
             os.makedirs(filepath)  # Ensure presence of courses directory.
         if num:
             filepath += "/" + str(num)
-            if not path.exists(filepath):
+            if not os.path.exists(filepath):
                 os.makedirs(filepath)  # Ensure presence of course directory.
             if regblock:
                 filepath += "/regblocks"
     filepath += ".json"
     # Get the page.
-    page = fetch.get(fetch.term, dept, num, regblock, delay=delay)
+    page = fetch.get(term, dept, num, regblock, delay=delay)
     # Write it to the file.
     with open(filepath, "w+") as file:
         file.write(page)
@@ -80,7 +80,7 @@ def write_page(fetch, term, dept=None, num=None, regblock=None,
         reset_dir()
 
 
-def write_dept(fetch, term, dept, *, cinfo=True, in_dir=False, delay=0.0):
+def write_dept(fetch, term, dept, *, cinfo=False, in_dir=False, delay=0.0):
     """ Writes the course listings, details, and regblocks for the given
     department to the files in the test database.
     :param fetch: The Fetch object to get the data with.
@@ -93,20 +93,20 @@ def write_dept(fetch, term, dept, *, cinfo=True, in_dir=False, delay=0.0):
     print_now("Fetching course listings for " + dept + "...", sep='', end='')
     # Write course listings
     write_page(fetch, term, dept, in_dir=in_dir, delay=0)
-    print_now(" Success")
-    coursenums = get_coursenums(fetch, dept)
+    print_now("\tSuccess")
+    coursenums = get_coursenums(fetch, term, dept)
     for cnum in coursenums:
-        print_now("\tFetching " + dept + cnum + "\n\t\tRegblocks...",
+        print_now("\tFetching " + dept + cnum + " Regblocks...",
                   sep='', end='')
-        # Write regbocks
-        write_page(fetch, fetch.term, dept, cnum, True,
+        # Write regblocks
+        write_page(fetch, term, dept, cnum, True,
                    in_dir=in_dir, delay=delay)
-        print_now(" Success")
+        print_now("\tSuccess")
         if cinfo:
             print_now("\t\tCourse info...", end='')
             # Write course details
-            write_page(fetch, fetch.term, dept, cnum, False, in_dir=in_dir)
-            print_now(" Success")
+            write_page(fetch, term, dept, cnum, False, in_dir=in_dir)
+            print_now("\tSuccess")
 
 
 def write_term(pager, term, *, cinfo=False, in_dir=False):
@@ -118,7 +118,7 @@ def write_term(pager, term, *, cinfo=False, in_dir=False):
     """
     print_now("\nFetching term ", term, "...\n", sep="")
     write_page(pager, term, in_dir=in_dir)
-    depts = pager.get_json(pager.term)  # Get dept listings for term.
+    depts = pager.get_json(term)  # Get dept listings for term.
     depts = [d["id"] for d in depts]  # save the abbrevs we'll need to loop on
     for dept in depts:
         write_dept(pager, term, dept, cinfo=cinfo, in_dir=in_dir, delay=0.0)
@@ -135,8 +135,12 @@ def write_term_to_database(pager, term):
     reset_dir()
 
 
-def term_write_loop(pager):
-    for term in pager.termlist:
-        if not input("About to fetch term " + term + ".\n"
-                     "Enter anything to skip.\n"):
-            write_term_to_database(pager, term)
+def term_write_loop(pager, *, prompt=True):
+    if prompt:
+        for term in pager.termlist:
+            if not input("About to fetch term " + term + ".\n"
+                         "Enter anything to skip.\n"):
+                write_term_to_database(pager, term)
+    else:
+        for term in pager.termlist:
+                write_term_to_database(pager, term)

@@ -26,7 +26,7 @@ Not all of this is documented.
 Currently, jsonFetcher cleans the data before it is passed here.
 This isn't the most object-oriented way to do things, but it works... for now.
 """
-from time import strftime, strptime
+# from time import strftime, strptime
 
 '''
 INPUT_FILE = "../TranslatorInput.json"
@@ -43,7 +43,7 @@ class Period(object):
     def __init__(self, Type=None, professor=None, days=None, starts=None,
                  ends=None, building=None, room=None):
         self.type = Type
-        self.professor = professor
+        self.professor = professor.split(",")[0]
         self.professor_sort_name = professor
         self.professor_email = "look@it.up"
         self.days = days
@@ -129,7 +129,7 @@ class Section(object):
 class Course(object):
     def __init__(self, number=None, name=None, course_desc=None,
                  minCredits=None, maxCredits=None, dept=None,
-                 *, json=None, sections=None):
+                 *, json=None, sections=None, islabs=False):
         if json:
             self.parse_self(json)
             if sections:
@@ -139,13 +139,14 @@ class Course(object):
             self.parse_self_from_sections(sections)
         else:
             self.number = number  # num in dept 9999
-            self.name = name
+            self.name = ('LAB: ' if islabs else '') + name
             self.course_desc = course_desc
             self.minCredits = str(minCredits)
             self.maxCredits = str(maxCredits)
             self.gradeType = "normal"
             self.dept = dept  # not used for xml - identification only
             self.sections = []
+            self.islabs = islabs  # True if the course only holds lab sections
 
     def __str__(self):
         string = ('<course number="' + self.number + '" name="' + self.name

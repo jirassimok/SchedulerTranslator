@@ -28,7 +28,7 @@ def parse_periods(section):
             return strftime("%I:%M%p", strptime(str(tnum), "%H%M")).lstrip("0")
         except ValueError:
             errstring[0] += "ERROR invalid meeting time "
-            return "00:00AM"
+            return "4:00PM"
     prof = section["instructor"][0]["name"]  # not gonna bother with this
     Type = section["component"]
     timetable = (("M", "mon"), ("T", "tue"), ("W", "wed"),
@@ -55,7 +55,7 @@ def parse_periods(section):
             room = "X"
             errstring[0] += "ERROR bad location "
         if errstring:
-            prof = errstring[0]
+            prof += " " + errstring[0]
         periods.append(Period(Type, prof, days, starts, ends, building, room))
     return periods
 
@@ -67,7 +67,46 @@ def parse_section(sec):
 
     :return Section or False
     """
-    def parse_term(termstring):
+    def parse_termstring(termstring):
+        ts = termstring.split(' - ')
+        TL = ts[0].split()  # ["Season", "YEAR"]
+        termnum = TL[1]
+        if TL[0] == "Fall":
+            termnum += "01"
+        elif TL[0] == "Spring":
+            termnum += "02"
+        elif TL[0] == "Summer":
+            termnum += "03"
+        else:
+            raise ParseError("Invalid part of term: " + str(TL[0]))
+        return termnum, ts[1]
+    number = sec["sectionNumber"]
+    if len(number) > 3: # Non-labs have format X99
+        return False  # skip lab/conference sections
+    crn = sec["registrationNumber"]
+    seats = sec["seatsCapacity"]
+    availableseats = str(sec["openSeats"])  # also see sec["seatsFilled"]
+    max_waitlist = sec["waitlist"]  # always 0? for 1101
+    actual_waitlist = sec["waitlistOpen"]  # also always 0? for CS1101
+    term = parse_termstring(sec["partsOfTerm"])[0]
+    partOfTerm = parse_termstring(sec["partsOfTerm"])[1]
+    if partOfTerm=="Full Semester":
+            if "Spring" in term:
+                partOfTerm = "A Term, B Term"
+            elif "Fall" in term:
+                partOfTerm = "C Term, D Term"
+    section = Section(crn, number, seats, availableseats, max_waitlist,
+                      actual_waitlist, term, partOfTerm)
+    section.periods = parse_periods(sec)
+    return section
+
+def parse_lab(sec):
+    """ Reads a section json, and returns a Section object representing it.
+    This version returns false for any non-lab/conference sections.
+
+    :return Section or False
+    """
+    def parse_termstring(termstring):
         ts = termstring.split(' - ')
         TL = ts[0].split()  # ["Season", "YEAR"]
         termnum = TL[1]
@@ -82,23 +121,22 @@ def parse_section(sec):
         return termnum, ts[1]
 
     number = sec["sectionNumber"]
-    if "X" in number:
-        return False  # skip lab/conference sections
+    if len(number) <= 3:
+        return False  # skip non-lab/conference sections
     crn = sec["registrationNumber"]
     seats = sec["seatsCapacity"]
     availableseats = str(sec["openSeats"])  # also see sec["seatsFilled"]
     max_waitlist = sec["waitlist"]  # always 0? for 1101
     actual_waitlist = sec["waitlistOpen"]  # also always 0? for CS1101
-    term = parse_term(sec["partsOfTerm"])[0]
-    partOfTerm = parse_term(sec["partsOfTerm"])[1]
+    term = parse_termstring(sec["partsOfTerm"])[0]
+    partOfTerm = parse_termstring(sec["partsOfTerm"])[1]
     section = Section(crn, number, seats, availableseats, max_waitlist,
                       actual_waitlist, term, partOfTerm)
     section.periods = parse_periods(sec)
     return section
 
-
 # noinspection PyIncorrectDocstring
-def parse_course(json):
+def parse_course(json, *, islabs=False):
     """ Reads a course json, adding the couse to self.
 
     Bugs/poor design: If the first section does not accurately represent the
@@ -114,9 +152,12 @@ def parse_course(json):
     course_desc = s1["description"].replace('<br />', '')
     minCredits = s1["creditsMin"]
     maxCredits = s1["creditsMax"]
-    course = Course(number, name, course_desc, minCredits, maxCredits)
+    course = Course(number, name, course_desc, minCredits, maxCredits, islabs=islabs)
     for s in json["sections"]:
-        sec = parse_section(s)
+        if islabs:
+            sec = parse_lab(s)
+        else:
+            sec = parse_section(s)
         if sec:  # skip sections that parse_section rejects
             course.sections.append(sec)
     return course

@@ -104,7 +104,6 @@ class Fetch(object):
         self.termlist = list(termset)
         self.term = self.termlist[0]
 
-
     def get(self, term, dept=None, num=None, rb=False, *, clean=True, delay=0):
         """ Gets a page based on the arguments.
 
@@ -154,4 +153,5 @@ class Fetch(object):
     @staticmethod
     def clean_page(page):
         return page.replace('<br />', ' '
-                            ).replace('&', 'and')#.replace(u"\u2019", "'")
+                            ).replace('&', '&amp;').replace("<", "&lt;")
+        # .replace(u"\u2019", "'")
