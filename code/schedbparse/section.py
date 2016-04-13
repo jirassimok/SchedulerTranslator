@@ -36,8 +36,8 @@ class Section(object):
          to this Section.
          """
         # TODO: This should loop over jsection["meetings"] and build a bunch of periods,
-        # much like Course.add_regblocks.
-        period = Period(*['1','2','3','4','5','6','7','8'])
+        # much like Course.add_regblocks, and populate this.
+        period = Period('1','2','3','4','5','6','7','8')
 
         self.numberlist.append(jsection["sectionNumber"])
         self.numberlist.sort()
