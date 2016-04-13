@@ -1,1 +1,1 @@
-__all__ = ["schedbparse"]
+__all__ = ["schedb"]

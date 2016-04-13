@@ -26,7 +26,6 @@ Not all of this is documented.
 Currently, jsonFetcher cleans the data before it is passed here.
 This isn't the most object-oriented way to do things, but it works... for now.
 """
-# from time import strftime, strptime
 
 '''
 INPUT_FILE = "../TranslatorInput.json"
@@ -40,9 +39,9 @@ null = None
 
 
 class Period(object):
-    def __init__(self, Type=None, professor=None, days=None, starts=None,
+    def __init__(self, _type=None, professor=None, days=None, starts=None,
                  ends=None, building=None, room=None):
-        self.type = Type
+        self.type = _type
         self.professor = professor.split(",")[0]
         self.professor_sort_name = professor
         self.professor_email = "look@it.up"
@@ -134,7 +133,7 @@ class Course(object):
             self.parse_self(json)
             if sections:
                 pass
-                #add_section_only_data
+                # add_section_only_data
         elif sections:
             self.parse_self_from_sections(sections)
         else:

@@ -10,7 +10,7 @@ Temporarily put on hold to complete the lesser version of the functions in time
 for course registration.
 
 """
-from ..fetch import Fetch
+# from ..fetch import Fetch
 
 
 class Schedjson(object):
@@ -49,8 +49,6 @@ class Course(object):
 
     def parse_regblocks(self):
         pass
-
-
 
 
 class Sections(object):

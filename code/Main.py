@@ -2,7 +2,7 @@
 
 Author: Jacob Komissar
 
-Date: 2016-04-09/10
+Date: 2016-04-12
 
 Running this file will read all departments and courses in the local database
 (which must be running on port 8000) to a schedb, and print all the departments
@@ -18,20 +18,30 @@ from fetch import Fetch
 from tdbbuild import term_write_loop  # Only needed to be run once for now.
 import partial_parse
 import hostdb
+# import utility
 
 """ RUN_MODE determines what this program will do. Possible values are:
 get - Saves data from a web database to the local database.
 parse - Parses data from the local database to a schedb.
 """
 
+IO_PATH = "../io"
+# There are many better ways to do this, but this is not my top priority.
 if len(sys.argv)>1:  # If command line arguments found...
     RUN_MODE = sys.argv[1]
+    if len(sys.argv)>2:
+        hostdb.PORT = sys.argv[2]
+        if len(sys.argv)>3:
+            hostdb.DATABASE_PATH = sys.argv[3]
+            if len(sys.argv)>4:
+                IO_PATH = sys.argv[4]
+
 else:
     RUN_MODE = "unspecified"
 
-JSON_FILE = "../io/regblockslist.json"
-SCHEDB_FILE = "../io/new_v1.1.schedb"
-
+IO_PATH = IO_PATH.rstrip("/")
+JSON_FILE = IO_PATH + "/regblockslist.json"
+SCHEDB_FILE = IO_PATH + "/new_v1.1.schedb"
 
 # TODO: Create a set of classes to represent the json structure.
 # Using algorithms similar to the web->file database reader,
@@ -113,7 +123,7 @@ elif RUN_MODE == "parse":
     READING_DATABASE = True  # Should always be true as of 2016-04-12
     DATABASE_IS_LOCAL = True
 
-    WRITING_LOCAL_DATABASE = True
+    WRITING_LOCAL_DATABASE = False
 
     BUILDING_JSON = True
     BUILDING_SCHEDB = True
@@ -122,6 +132,12 @@ elif RUN_MODE == "unspecified":
 else:
     raise Exception('Invalid run mode: "' + RUN_MODE + '"')
 
+
+def get_and_list_depts(_schedb, _pager):
+    depts = _pager.get_json(pager.term)
+    _schedb.add_depts(depts)
+    for d, D in _schedb.departments.items():
+        print(d, "\t", D.abbrev, "\t", D.name, sep='')
 
 
 schedb = Schedb()
@@ -133,16 +149,8 @@ if READING_DATABASE:
     if DATABASE_IS_LOCAL:
         hostdb.run_database_server()
 
-
-def get_and_list_depts(_schedb, _pager):
-    depts = _pager.get_json(pager.term)
-    _schedb.add_depts(depts)
-    for d, D in _schedb.departments.items():
-        print(d, "\t", D.abbrev, "\t", D.name, sep='')
-
-
 if READING_DATABASE and BUILDING_JSON:
-    partial_parse.concatenate_regblocks(pager, JSON_FILE)
+    partial_parse.concatenate_regblocks(pager, JSON_FILE, verbose=False)
 if BUILDING_SCHEDB:
     partial_parse.obs_main_populate_schedb(
         schedb, JSON_FILE, SCHEDB_FILE)

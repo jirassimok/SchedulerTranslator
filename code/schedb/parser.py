@@ -9,8 +9,9 @@ Original json to schedb parsing functions.
 These functions should be replaced by methods of the schedb classes.
 
 """
+from time import strftime, strptime
 from .dept import Dept
-from .coursec import *
+from .coursec import Course, Section, Period
 
 
 class ParseError(Exception):

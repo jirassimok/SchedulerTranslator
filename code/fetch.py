@@ -58,9 +58,9 @@ class Fetch(object):
         """ Creates a valid scheduler session by logging in to bannerweb and
         navigating to the schduler.
 
-        :param sid: username
-        :param pin: password
-        :return: True if successful. None if hosting locally..
+        @param sid: username
+        @param pin: password
+        @return: True if successful. None if hosting locally..
         """
         if self.hosting_locally:  # Prevent large session initialization
             return None
@@ -98,7 +98,7 @@ class Fetch(object):
 
         If multiple termstrings are provided, self.term is not guaranteed to be
         set to the first.
-        :param termstrings: Strings representing the terms.
+        @param termstrings: Strings representing the terms.
         """
         termset = {term.strip("/") for term in termstrings}
         self.termlist = list(termset)
@@ -111,13 +111,13 @@ class Fetch(object):
         retrieved.
         In standard use, self.term should be passed as term.
 
-        :param term: The term to get. As last, this will fetch the term list.
-        :param dept: The department to get. As last, will fetch course list.
-        :param num: The course's number. As last, will fetch course information.
-        :param rb: If true, the course's registration blocks will be fetched.
-        :param clean: If false, the data will not be cleaned for schedb parsing.
-        :param delay: How long to wait before fetching the page.
-        :return: The retrieved page.
+        @param term: The term to get. As last, this will fetch the term list.
+        @param dept: The department to get. As last, will fetch course list.
+        @param num: The course's number. As last, will fetch course information.
+        @param rb: If true, the course's registration blocks will be fetched.
+        @param clean: If false, the data will not be cleaned for schedb parsing.
+        @param delay: How long to wait before fetching the page.
+        @return: The retrieved page.
         """
         time.sleep(delay)
         target = self.url + term + "/subjects"
@@ -152,6 +152,7 @@ class Fetch(object):
 
     @staticmethod
     def clean_page(page):
-        return page.replace('<br />', ' '
-                            ).replace('&', '&amp;').replace("<", "&lt;")
+        return page.replace('<br />', ' ')
+        # .replace("<", "&lt;")
+        # .replace('&', '&amp;')
         # .replace(u"\u2019", "'")

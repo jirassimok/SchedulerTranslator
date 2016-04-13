@@ -5,9 +5,15 @@ Author: Jacob Komissar
 Date: 2016-04-11
 
 Obsolete versions
+
+Currently, this file does NOT attempt to ignore grad courses.
+Uncommenting that bit (the check for length != 4) will not do what I had hoped.
+This does not work and causes errors, but I'm not fixing it, because I am
+reworking much of the parser from scratch, and this file will be made fully
+obsolete by the new parsers.
 """
 # TODO: Replace this file (obsolete_partial_parse) and all of its functions.
-# from json import load as json_load
+from json import load as json_load
 from json import loads as json_loads
 from utility import maybe_print_now
 
@@ -18,20 +24,20 @@ def concatenate_regblocks(pager, output_file, verbose=True):
     The output format is
     {"jsonlist":[regblocks, regblocks, regblocks, ...]}
 
-    :param pager: The pager to get the regblocks with.
-    :param output_file: The file to output to.
-    :param verbose: If True, progress will be printed.
+    @param pager: The pager to get the regblocks with.
+    @param output_file: The file to output to.
+    @param verbose: If True, progress will be printed.
     """
     regblocks = []
-    departments = []
+    departments = set()
     for term in pager.termlist:
         # Get departments for the term
         maybe_print_now(verbose, "\nReading term ", term, "...", sep='', end='')
         depts = pager.get(term)
-        deptabbrevs = [d["id"] for d in json_loads(depts)]
-        departments.append(depts)
+        deptabbrevs = {d["id"] for d in json_loads(depts)}
+        departments = departments.union(depts)
         maybe_print_now(verbose, " Success\n")
-
+        maybe_print_now(True, deptabbrevs)
         # Get course listings for each department.
         for dept in deptabbrevs:
             maybe_print_now(verbose, "Reading dept ", dept, "...",
@@ -39,12 +45,19 @@ def concatenate_regblocks(pager, output_file, verbose=True):
             courses = [crs["number"] for crs in pager.get_json(term, dept)]
             maybe_print_now(verbose, " Success")
             for cnum in courses:
-                maybe_print_now(verbose, "\tFetching", dept + cnum, "regblocks...",
-                                end='')
+                # maybe_print_now(True, dept, cnum)
+                '''
+                if len(cnum)!=4:
+                    maybe_print_now(verbose, "\tSkipping", dept, cnum,
+                                    ": Course number < 1000")
+                    continue
+                '''
+                maybe_print_now(verbose, "\tFetching", dept + cnum,
+                                "regblocks...", end='')
+                # maybe_print_now(True, cnum)
                 courseregblocks = pager.get(term, dept, cnum, rb=True)
+                regblocks.append(courseregblocks)
                 maybe_print_now(verbose, " Success")
-                if '"null"' not in courseregblocks:
-                    regblocks.append(courseregblocks)
 
     regblocks_str = '"regblocks":[' + ','.join(regblocks) + ']'
     departments_str = '"departments":[' + ','.join(departments) + ']'
@@ -57,8 +70,7 @@ def obs_main_populate_schedb(schedb, input_file, output_file):
     """ Previous main function.
     Obsolete. """
     with open(input_file, "r") as JSON:
-        string = JSON.read()
-    json = json_loads(string)
+        json = json_load(JSON)
     for term in json["departments"]:  # Add departments by term.
         schedb.add_depts(term)
     schedb.obs_convert_list_of_rb_jsons(json["regblocks"])
