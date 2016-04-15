@@ -35,9 +35,9 @@ def concatenate_regblocks(pager, output_file, verbose=True):
         maybe_print_now(verbose, "\nReading term ", term, "...", sep='', end='')
         depts = pager.get(term)
         deptabbrevs = {d["id"] for d in json_loads(depts)}
-        departments = departments.union(depts)
+        departments.union(depts)
         maybe_print_now(verbose, " Success\n")
-        maybe_print_now(True, deptabbrevs)
+        # maybe_print_now(verbose, deptabbrevs)
         # Get course listings for each department.
         for dept in deptabbrevs:
             maybe_print_now(verbose, "Reading dept ", dept, "...",

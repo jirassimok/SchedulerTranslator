@@ -31,7 +31,7 @@ import getpass
 class Fetch(object):
     regblocks = True  # A constant for use as the "rb" parameter.
 
-    def __init__(self, *, readfile=None, local=False, offline=False):
+    def __init__(self, *, readfile=None, local=False, offline=False, port=8000):
         self.page = None  # A page retrieved with set_page().
         self.term = ""  # The current term.
         self.termlist = []
@@ -50,9 +50,9 @@ class Fetch(object):
             else:
                 sid = input("username:")
                 pin = getpass.getpass("password:")
-                self.start_session(sid, pin)
+            self.start_session(sid, pin)
         else:  # if local
-            self.url = "http://localhost:8000/"
+            self.url = "http://localhost:" + str(port) + "/"
 
     def start_session(self, sid, pin):
         """ Creates a valid scheduler session by logging in to bannerweb and
@@ -152,7 +152,8 @@ class Fetch(object):
 
     @staticmethod
     def clean_page(page):
-        return page.replace('<br />', ' ')
+        return page.replace('<br />', ' ').replace('&', 'and'
+            ).encode("ascii", errors="ignore").decode("ascii")
         # .replace("<", "&lt;")
         # .replace('&', '&amp;')
         # .replace(u"\u2019", "'")

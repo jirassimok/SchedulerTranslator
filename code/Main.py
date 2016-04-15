@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """ Main.py
 
 Author: Jacob Komissar
@@ -31,6 +32,7 @@ if len(sys.argv)>1:  # If command line arguments found...
     RUN_MODE = sys.argv[1]
     if len(sys.argv)>2:
         hostdb.PORT = sys.argv[2]
+        PORT = sys.argv[2]
         if len(sys.argv)>3:
             hostdb.DATABASE_PATH = sys.argv[3]
             if len(sys.argv)>4:
@@ -38,6 +40,7 @@ if len(sys.argv)>1:  # If command line arguments found...
 
 else:
     RUN_MODE = "unspecified"
+    PORT = 8000
 
 IO_PATH = IO_PATH.rstrip("/")
 JSON_FILE = IO_PATH + "/regblockslist.json"
@@ -142,7 +145,7 @@ def get_and_list_depts(_schedb, _pager):
 
 schedb = Schedb()
 if READING_DATABASE:
-    pager = Fetch(local=DATABASE_IS_LOCAL)  # readfile=None
+    pager = Fetch(local=DATABASE_IS_LOCAL, port=PORT)  # readfile=None
     print("Pager initialized")
     # pager.set_terms("Fall%202016")
     pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")

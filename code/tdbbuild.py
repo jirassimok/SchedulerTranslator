@@ -60,6 +60,8 @@ def write_page(fetch, term, dept=None, num=None, regblock=None,
         set_dir()
     # Build the filepath the same way Fetch.get builds a url.
     filepath = LOCAL_DATABASE + term.replace("%20", " ") + "/subjects"
+    if not os.path.exists(filepath):
+        os.makedirs(filepath)  # Ensure presence of courses directory.
     if dept:
         filepath += "/" + dept + "/courses"
         if not os.path.exists(filepath):

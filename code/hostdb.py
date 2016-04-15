@@ -80,7 +80,7 @@ def run_database_server(*, verbose=True):
         print("\tSuccess\n")
         sys.stdout.flush()
 
-    sleep(5)  # Give the server time to start.
+    sleep(5)  # Give the server time to start, and me time to dismiss a warning.
 
 
 def close_database_server(*, verbose=True):

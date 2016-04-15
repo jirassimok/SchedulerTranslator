@@ -9,7 +9,7 @@ schedb.py currently contains the skeletons of the classes that represent the
 
 Current plan: Still use the old schedb classes, but with new algorithms.
 
-
+TODO: Add final steps: xml.ElementTree.tostring(xml.ElementTree.fromstring(str(schedb)))
 
 Previously, departments were built from per-term department lists and strings
 as they currently are.
@@ -23,7 +23,7 @@ Courses are inserted with a department and course number.
     regblocks["id"]
 
 
-I leave it up to the dept class or something above them to parse courses.
+I leave it up to the dept class or something above it to parse courses.
 
 
 This all takes place inside a course, starting with a regblocks json.

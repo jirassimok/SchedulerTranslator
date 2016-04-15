@@ -5,11 +5,11 @@ wpi.collegescheduler.com and writes it to a local database, which can be
 translated into the old scheduler's schedb xml format.
 
 
-To get a database from the server, run as:
-python3 Main.py get DATABASE_PATH
+To get a database from the server, run with:
+Main.py get DATABASE_PATH
 
-To transcribe the database to an xml, run as:
-python3 Main.py parse PORT DATABASE_PATH IO_PATH
+To transcribe the database to an xml, run with:
+Main.py parse PORT DATABASE_PATH IO_PATH
 
 If not specified, PORT, DATABASE_PATH, and IO_PATH default to 8000,
 "../DATABASE", and "../io", respectively.

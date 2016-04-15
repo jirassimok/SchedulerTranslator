@@ -12,7 +12,9 @@ matching
 """
 from schedbparse.section import Section
 
+
 class Course(object):
+
     def __init__(self, dept, number, course_desc="NO DESCRIPTION AVAILABLE",
                  minCredits=1, maxCredits=1, gradeType="normal"):
         self.dept = dept  # Not used for xml - identification only.
@@ -27,16 +29,13 @@ class Course(object):
         """ Two courses are equal if they have the same number and department.
         @param other: The object to compare to.
         """
-        try:
-            return self.number == other.number and self.dept == other.dept
-        except AttributeError:
-            return False
+        return type(self) is type(other) and self.number == other.number and self.dept == other.dept
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
     def add_regblocks(self, regblocksjson):
-        """ Parses a regblocks json into this courses' sections and their
+        """ Parse a regblocks json into this courses' sections and their
         periods.
 
         This function does most of the heavy lifting for the actual parsing
@@ -63,14 +62,18 @@ class Course(object):
                 jsection = jsections[crn]  # section is a regblocks[section]
                 if len(jsection["sectionNumber"])==3:  # if it's a lecture,
                     new_section.add_main_info(jsection)  # add info to object
+                    # TODO: Add "main" section for lost info. See note ONE below
                 new_section.add_meetings(jsection)
 
             # Concatenate lab and lecture section numbers
-            # Maybe check if the section is correctly-populated first?
+            # TODO: Check if the section is correctly-populated first.
             self.sections.append(new_section)
 
 
-
+        # note ONE: The "main" section for a class should exist to hold
+        # information overwritten by periods, such as the lecture's available
+        # seats and waitlist. This might also warrant using the lab's CRN for
+        # each regblock.
 
 
 
