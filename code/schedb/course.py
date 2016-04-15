@@ -6,33 +6,53 @@ Date: 2016-04-12
 
 Class to represent courses and parse course jsons.
 
+The Course class parses regblocks jsons registrationBlocks values, and minimally
+parses the sections values for the sole purpose of setting up appropriate
+sections by combining sections according to the registrationBlocks.
+
 Style note:
 Where the schedb xml uses hyphens in attribute names, I use camelCase for the
 matching
 """
-from schedbparse.section import Section
+from .section import Section
 
 
 class Course(object):
 
-    def __init__(self, dept, number, course_desc="NO DESCRIPTION AVAILABLE",
-                 minCredits=1, maxCredits=1, gradeType="normal"):
-        self.dept = dept  # Not used for xml - identification only.
-        self.number = number
-        self.course_desc = course_desc
-        self.minCredits = int(minCredits)
-        self.maxCredits = int(maxCredits)
+    def __init__(self, number, name, desc="NO DESCRIPTION AVAILABLE",
+                 minCredits=1, maxCredits=1, gradeType="normal", *, dept=None):
+        # TODO: Remove dept from Course; they don't need to know where they are.
+        self.dept = dept  # Not used for xml - identification only; may be None
+        self.number = str(number)  # should always be string anyway
+        self.name = str(name)  # same, as above, but you never know...
+        self.course_desc = desc
+        self.minCredits = str(minCredits)
+        self.maxCredits = str(maxCredits)
         self.gradeType = gradeType
         self.sections = []
+        # TODO: Rewrite course constructor to parse a little of something.
 
     def __eq__(self, other):
         """ Two courses are equal if they have the same number and department.
+
         @param other: The object to compare to.
         """
-        return type(self) is type(other) and self.number == other.number and self.dept == other.dept
+        return type(self) is type(other) and self.number == other.number \
+                and self.dept == other.dept
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        string = ['<course number="', self.number, '" name="', self.name,
+                  '" course_desc="', self.course_desc, '" min-credits="',
+                  self.minCredits, '" max-credits="', self.maxCredits,
+                  '" grade-type="', self.gradeType, '">']
+        for s in self.sections:
+            string.append(str(s))
+        string.append('</course>')
+        stringlist = map(str, string)
+        return ''.join(stringlist)
 
     def add_regblocks(self, regblocksjson):
         """ Parse a regblocks json into this courses' sections and their
@@ -59,7 +79,11 @@ class Course(object):
         for regblock in regblocks:  # A regblock is a list of crns.
             new_section = Section()
             for crn in regblock:
-                jsection = jsections[crn]  # section is a regblocks[section]
+                try:
+                    jsection = jsections[crn]  # section is a regblocks[section]
+                except KeyError:
+                    raise KeyError("Missing section: " + crn)
+
                 if len(jsection["sectionNumber"])==3:  # if it's a lecture,
                     new_section.add_main_info(jsection)  # add info to object
                     # TODO: Add "main" section for lost info. See note ONE below
@@ -69,15 +93,13 @@ class Course(object):
             # TODO: Check if the section is correctly-populated first.
             self.sections.append(new_section)
 
-
         # note ONE: The "main" section for a class should exist to hold
         # information overwritten by periods, such as the lecture's available
         # seats and waitlist. This might also warrant using the lab's CRN for
         # each regblock.
 
 
-
-a = Course(1, 1)
+a = Course(1, 1, 1)
 true = True
 false = False
 null = None
@@ -405,3 +427,4 @@ testrbs = {"registrationBlocks":[     {"id":"CS;;1101@10290-15460",
 
 
 a.add_regblocks(testrbs)
+print(a)

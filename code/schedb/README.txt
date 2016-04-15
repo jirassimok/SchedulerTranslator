@@ -26,37 +26,60 @@ Courses are inserted with a department and course number.
 I leave it up to the dept class or something above it to parse courses.
 
 
-This all takes place inside a course, starting with a regblocks json.
 
-def Course.add_regblocks(self, regblocks):
+Top-down bits:
 
-sections = regblocksjson["sections"]
-regblocks = regblocksjson["registrationBlocks"]
+Besides the things I say each thing can be given, they can also be given
+anything required for something below them, so they can pass it on. Also, it may
+be possible to initialize these with additional values, but such options are not
+used in the current implementation.
 
-# regblock crns in list format: ((crn, crn), (crn, crn))
-regblocks = [[regblock["sectionIds"]] for regblock in regblocks if
-            regblock["enabled"]==True]
+The Schedb takes a term list, which it actually SHOULD be able to parse!
+Schedb(termlist)
 
-# sections in dict keyed by crn (as str) (section["registrationNumber"] also works)
-jsections = { section["id"]: section for section in sections }
+A Term takes its string, and can be given its department list, which it turns
+into a dictionary of abbrevs and Depts.
+Term(termstring, deptlistjson)
 
-for regblock in regblocks:
-    sec = Section()
-    for crn in regblock:
-        jsection = jsections[crn]  # jsection is a regblocks json
-        period = Period(jsection)  # Parse the jsection's meeting times (plural!)
+A Dept takes its name and abbrev, and can be given its course list, which it
+turns into a dictionary of course numbers and courses.
 
-        if len(jsection["sectionNumber"])==3:  # if it's a lecture
-            self.add_info_from_secjson(jsection) # add course info (credits, mainly)
-            sec.add_main_info(jsection)  # add section info to section
+A Course takes its (department,) name(,) and number, and can be given its
+regblocks, which it parses into its sections.
 
-        sec.add_period(period)  # ??
+A Section takes nothing, and can be given its regblocks, which it parses into
+itself and its periods.
+Section()
+Section.add_main_info(regblocks["section"])
+Section.add_meetings(regblocks["section"])
 
-    if sec.[valid section]:  # Section function, probably recurs to period function
-        self.sections.append(sec)
+A Period takes all of its information and can be given nothing.
+Period(_type, instructor, meeting, crn)
+
+
+# TODO NOTE: Currently, I could build the database without courses, then ...
+# get all the regblocks, and add courses by looking at their departments.
+# This might allow me to more-easily use my current framework with the new one,
+# especially after making the new framework for Schedbs/Terms/Depts, but that
+# isn't really a goal I need to have.
 
 
 Add a safeguard against '""' appearing in the json. Before using json.loads
+
+
+
+Fetch-down bits:
+1. Get terms
+ 2. Store terms
+3. Loop over stored terms, getting depts
+   4. Store depts in loop, and...
+  5. Loop over depts, getting course lists
+     6. Store courses with minimal info, and...
+    7. Loop over courses, getting regblocks
+      8. Store regblocks - nothing left to get
+    .. End course loop
+  .. End dept loop
+.. End term llop
 
 
 
