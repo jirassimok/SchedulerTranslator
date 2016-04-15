@@ -104,7 +104,7 @@ class Fetch(object):
         self.termlist = list(termset)
         self.term = self.termlist[0]
 
-    def get(self, term, dept=None, num=None, rb=False, *, clean=True, delay=0):
+    def get(self, term, dept=None, num=None, rb=False, *, clean=False, delay=0):
         """ Gets a page based on the arguments.
 
         Depending on how many arguments are given, different pages will be
