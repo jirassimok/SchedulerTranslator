@@ -32,7 +32,7 @@ class Fetch(object):
     regblocks = True  # A constant for use as the "rb" parameter.
 
     def __init__(self, *, readfile=None, local=False, offline=False, port=8000):
-        self.page = None  # A page retrieved with set_page().
+        # self.page = None  # A page retrieved with set_page().
         self.term = ""  # The current term.
         self.termlist = []
 
@@ -143,15 +143,16 @@ class Fetch(object):
         # print('\n', target, '\n', page)
         return page
 
-    def get_json(self, term, dept=None, num=None, rb=False):
-        return json.loads(self.get(term, dept, num, rb, clean=True))
+    def get_json(self, term=None, dept=None, num=None, rb=True):
+        return json.loads(self.get(term, dept, num, rb=rb, clean=False))
 
-    def set_page(self, term, dept=None, num=None, rb=False, *, clean=True):
-        self.page = self.get(term, dept, num, rb, clean=clean)
+    # def set_page(self, term=None, dept=None, num=None, rb=False,
+    #              *, clean=False):
+    #     self.page = self.get(term, dept, num, rb, clean=clean)
 
-    def set_json(self):
-        self.page = self.page.json()
-        # self.page = json.loads(self.page)
+    # def set_json(self):
+    #     self.page = self.page.json()
+    #     # self.page = json.loads(self.page)
 
     @staticmethod
     def clean_page(page):
