@@ -80,6 +80,7 @@ class Course(object):
 
         for regblock in regblocks:  # A regblock is a list of crns.
             self.add_section(regblock, jsections)
+        self.sections.sort()  # put them in order - enabled by Section.__lt__()
 
     def add_section(self, crns, jsections):
         """ Parse a sections json and a list of CRNs into one of this course's
@@ -104,4 +105,6 @@ class Course(object):
 
         # Concatenate lab and lecture section numbers
         # TODO: Check if the section is correctly-populated first.
-        self.sections.append(new_section)
+        if new_section not in self.sections:  # prevent duplicate sections
+            self.sections.append(new_section)
+

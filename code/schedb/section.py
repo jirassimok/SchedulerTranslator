@@ -44,6 +44,18 @@ class Section(object):
         """
         return type(self) is type(other) and self.number == other.number
 
+    def __lt__(self, other):
+        """ A section is less than another if its number is lower.
+
+        @param other: The object to compare to.
+        @return True if self.number<other.number, false otherwise.
+        @raise TypeError if other is not a Section.
+        """
+        if isinstance(other, Section):
+            return self.number < other.number
+        else:
+            return not (self > other)  # bad shortcut to unorderable TypeError
+
     def __str__(self):
         string = ['<section crn="', self.crn, '" number="', self.number,
                   '" seats="', self.seats, '" availableseats="',
@@ -108,11 +120,10 @@ class Section(object):
 
         # TODO: Remove the next five lines and previous comment string.
         # These lines added for testing purposes.
-        self.seats = str(jsection["seatsCapacity"])  # already a string
-        self.availableseats = str(jsection["openSeats"])  # not a string until now
-        self.max_waitlist = str(jsection["waitlist"])  # Add from Smallest regblock
-        self.actual_waitlist = str(jsection["waitlistOpen"])  # Add from same as above
-
+        self.seats = str(jsection["seatsCapacity"])
+        self.availableseats = str(jsection["openSeats"])
+        self.max_waitlist = str(jsection["waitlist"])
+        self.actual_waitlist = str(jsection["waitlistOpen"])
 
     def add_meetings(self, jsection):
         """ Parse a regblocks section into one or more periods and add them to
