@@ -52,7 +52,7 @@ class Fetch(object):
                 pin = getpass.getpass("password:")
             self.start_session(sid, pin)
         else:  # if local
-            self.url = "http://localhost:" + str(port) + "/"
+            self.url = "http://localhost:" + str(port) + "/terms"
 
     def start_session(self, sid, pin):
         """ Creates a valid scheduler session by logging in to bannerweb and

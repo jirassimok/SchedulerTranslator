@@ -4,7 +4,23 @@ Author: Jacob Komissar
 
 Date: 2016-04-10
 
-Function for easier construction of test database.s
+Function for easier construction of test database.
+
+Structure of the test database:
+DATABASE/
+         terms.json
+         terms/
+               Season YEAR/
+                           subjects.json
+                           subjects/
+                                    DEPT/
+                                         courses.json
+                                         courses/
+                                                 NUMBER/
+                                                        regblocks.json
+                                                 NUMBER...
+                                    DEPT...
+               Season YEAR...
 """
 import os
 from utility import maybe_print_now
@@ -43,7 +59,7 @@ def get_coursenums(fetch, term, dept):
 
 
 def write_page(fetch, term=None, dept=None, num=None,
-               *, regblocks=False, in_dir=False, delay=0.0):
+               *, regblocks=True, in_dir=False, delay=0.0):
     """ Gets and writes a page to a file.
 
     @param fetch: A Fetch object to use to get the pages.
@@ -57,11 +73,9 @@ def write_page(fetch, term=None, dept=None, num=None,
     if not in_dir:
         set_dir()
     # Build the filepath the same way Fetch.get builds a url.
-    filepath = "./"  # We are now in the right directory.
-    if not term:
-        filepath += "terms"
-    else:
-        filepath += term.replace("%20", " ") + "/subjects"
+    filepath = "./terms"  # We are now in the right directory.
+    if term:
+        filepath += "/" + term.replace("%20", " ") + "/subjects"
         if not os.path.exists(filepath):
             os.makedirs(filepath)  # Ensure presence of courses directory.
         if dept:
@@ -76,6 +90,7 @@ def write_page(fetch, term=None, dept=None, num=None,
                     filepath += "/regblocks"
     filepath += ".json"
     # Get the page.
+    print("Fetching:", filepath)
     page = fetch.get(term, dept, num, rb=regblocks, delay=delay)
     # Write it to the file.
     with open(filepath, "w+") as file:
