@@ -42,7 +42,7 @@ class Fetch(object):
         self.session = None  # Placeholder
 
         if not local:
-            self.url = "https://wpi.collegescheduler.com/api/terms/"
+            self.url = "https://wpi.collegescheduler.com/api/terms"
             if readfile:
                 with open(readfile) as f:
                     sid = f.readline()[:-1]
@@ -104,7 +104,8 @@ class Fetch(object):
         self.termlist = list(termset)
         self.term = self.termlist[0]
 
-    def get(self, term, dept=None, num=None, rb=False, *, clean=False, delay=0):
+    def get(self, term=None, dept=None, num=None,
+            *, rb=True, clean=False, delay=0):
         """ Gets a page based on the arguments.
 
         Depending on how many arguments are given, different pages will be
@@ -120,13 +121,15 @@ class Fetch(object):
         @return: The retrieved page.
         """
         time.sleep(delay)
-        target = self.url + term + "/subjects"
-        if dept:
-            target += "/" + dept + "/courses"
-            if num:
-                target += "/" + str(num)
-                if rb:
-                    target += "/regblocks"
+        target = self.url
+        if term:
+            target += "/" + term + "/subjects"
+            if dept:
+                target += "/" + dept + "/courses"
+                if num:
+                    target += "/" + str(num)
+                    if rb:
+                        target += "/regblocks"
         target += ".json" if self.hosting_locally else ""
         # print(target)
         if self.hosting_locally:
