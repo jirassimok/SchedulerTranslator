@@ -42,11 +42,9 @@ def get_coursenums(fetch, term, dept):
     return [course["number"] for course in courses]
 
 
-def write_page(fetch, term, dept=None, num=None, regblock=None,
-               *, in_dir=False, delay=0.0):
+def write_page(fetch, term=None, dept=None, num=None,
+               *, regblocks=False, in_dir=False, delay=0.0):
     """ Gets and writes a page to a file.
-
-    The term directory must exist beforehand, but all others need not exist.
 
     @param fetch: A Fetch object to use to get the pages.
     @param term: The term to get data for. As last, will fetch dept list.
@@ -59,22 +57,26 @@ def write_page(fetch, term, dept=None, num=None, regblock=None,
     if not in_dir:
         set_dir()
     # Build the filepath the same way Fetch.get builds a url.
-    filepath = LOCAL_DATABASE + term.replace("%20", " ") + "/subjects"
-    if not os.path.exists(filepath):
-        os.makedirs(filepath)  # Ensure presence of courses directory.
-    if dept:
-        filepath += "/" + dept + "/courses"
+    filepath = "./"  # We are now in the right directory.
+    if not term:
+        filepath += "terms"
+    else:
+        filepath += term.replace("%20", " ") + "/subjects"
         if not os.path.exists(filepath):
             os.makedirs(filepath)  # Ensure presence of courses directory.
-        if num:
-            filepath += "/" + str(num)
+        if dept:
+            filepath += "/" + dept + "/courses"
             if not os.path.exists(filepath):
-                os.makedirs(filepath)  # Ensure presence of course directory.
-            if regblock:
-                filepath += "/regblocks"
+                os.makedirs(filepath)
+            if num:
+                filepath += "/" + str(num)
+                if not os.path.exists(filepath):
+                    os.makedirs(filepath)
+                if regblocks:
+                    filepath += "/regblocks"
     filepath += ".json"
     # Get the page.
-    page = fetch.get(term, dept, num, regblock, delay=delay)
+    page = fetch.get(term, dept, num, rb=regblocks, delay=delay)
     # Write it to the file.
     with open(filepath, "w+") as file:
         file.write(page)
