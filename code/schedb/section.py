@@ -57,7 +57,7 @@ class Section(object):
         return ''.join(stringlist)
 
     @staticmethod
-    def fix_term(self, parts_of_term):
+    def fix_term(parts_of_term):
         """ Parse a string of the form "Season YEAR - X Term" into a string
         of the form "YEARSM" and a string of the form "X Term", where SM is the
         semester's number.
@@ -96,7 +96,23 @@ class Section(object):
         self.partOfTerm = termtuple[1]
         self.crn = jsection["id"]
         # TODO Possibly switch to use crn from lab period - but which if more?
-        print("SECTION DATA FOR", jsection["id"])
+        # TODO VERY IMPORTANT: Find a way to store lab/conference CRNs. Issues:
+        # We could use the lab period CRN, which would work because we have the
+        # lectures also listed as seaprate courses, but this approach would fail
+        # for courses with both a lab and a conference, because those have 3
+        # CRNs, and we can only easily store one per period.
+        # The second option is to concatenate them WITHOUT SPACES to the main
+        # CRN. This would work all right, but would be a pain to read.
+
+        # print("SECTION DATA FOR", jsection["id"])
+
+        # TODO: Remove the next five lines and previous comment string.
+        # These lines added for testing purposes.
+        self.seats = str(jsection["seatsCapacity"])  # already a string
+        self.availableseats = str(jsection["openSeats"])  # not a string until now
+        self.max_waitlist = str(jsection["waitlist"])  # Add from Smallest regblock
+        self.actual_waitlist = str(jsection["waitlistOpen"])  # Add from same as above
+
 
     def add_meetings(self, jsection):
         """ Parse a regblocks section into one or more periods and add them to
@@ -104,6 +120,8 @@ class Section(object):
 
         Any values not fully parsed/handled here are handled/parsed by
         Period.fix_values, and are marked here with "# *raw" and a reason.
+
+        @param jsection: The json regblocks["section"] to parse and add.
         """
 
         # Get information shared by all periods.
@@ -116,7 +134,7 @@ class Section(object):
             if Period:
                 self.periods.append(period)
 
-        print("PERIOD", jsection["sectionNumber"])
+        # print("PERIOD", jsection["sectionNumber"])
 
         self.numberlist.append(jsection["sectionNumber"])
         self.numberlist.sort()
