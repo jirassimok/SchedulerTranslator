@@ -14,9 +14,10 @@ passed separately.
 
 Style note:
 Where the schedb xml uses hyphens in attribute names, I use camelCase for the
-matching
+matching variables here.
 """
 from .period import Period
+
 
 class Section(object):
     def __init__(self, jsection=None):
@@ -35,6 +36,13 @@ class Section(object):
 
         if jsection:
             self.add_main_info(jsection)
+            self.add_meetings(jsection)
+
+    def __eq__(self, other):
+        """ Sections are equal if they have the same section numbers.
+        Please do not compare sections from different courses. That's dumb.
+        """
+        return type(self) is type(other) and self.number == other.number
 
     def __str__(self):
         string = ['<section crn="', self.crn, '" number="', self.number,
@@ -48,6 +56,35 @@ class Section(object):
         stringlist = map(str, string)
         return ''.join(stringlist)
 
+    @staticmethod
+    def fix_term(self, parts_of_term):
+        """ Parse a string of the form "Season YEAR - X Term" into a string
+        of the form "YEARSM" and a string of the form "X Term", where SM is the
+        semester's number.
+
+        @param parts_of_term: The string to parse.
+        @return: A tuple of the semester number/string and term strings.
+        """
+        split = parts_of_term.split(' - ')  # ["Season YEAR", "X Term"]
+        semester = split[0].split()  # ["Season", "YEAR"]
+        semesters = {"Fall": "01", "Spring": "02"}  # , "Summer": "03"
+        try:
+            semesternum = semesters[semester[0]]
+            semesterstring = semester[1] + semesternum  # YEARSM
+        except KeyError:
+            raise KeyError("Invalid part of term: " + str(semester[0]))
+        if split[1] == "Full Semester":
+            semesters = {"01": "A Term, B Term", "02": "C Term, D Term"}
+            split[1] = semesters[semesternum]
+        return semesterstring, split[1]
+
+    def fix_section_number(self):
+        """ Concatenate lab and section numbers.
+        Probably should be part of or called from add_meetings. """
+        self.numberlist.sort()  # should always be sorted anyway
+        self.number = ' '.join((num[1:] if len(num) > 3 else num)
+                               for num in self.numberlist)
+
     def add_main_info(self, jsection):
         """ Fill out universal data in the section, which should be shared by
         all of this object's periods.
@@ -60,32 +97,6 @@ class Section(object):
         self.crn = jsection["id"]
         # TODO Possibly switch to use crn from lab period - but which if more?
         print("SECTION DATA FOR", jsection["id"])
-
-    @staticmethod
-    def fix_term(self, parts_of_term):
-        """ Parse a string of the form "Season YEAR - X Term" into a string
-        of the form "YEARSM" and a string of the form "X Term", where SM is the
-        semester's number.
-
-        @param parts_of_term: The string to parse.
-        @return: A tuple of the semester number/string and term strings.
-        """
-        split = parts_of_term.split(' - ')  # ["Season YEAR", "X Term"]
-        semester = split[0].split()  # ["Season", "YEAR"]
-        semesters = {"Fall":"01", "Sprint":"02", "Summer":"03"}
-        try:
-            semesterstring = semester[1] + semesters[semester[0]]  # YEARSM
-        except KeyError:
-            raise KeyError("Invalid part of term: " + str(semester[0]))
-
-        return semesterstring, split[1]
-        # TODO Fix full-semester course term parsing. If split[1] == "Full..."
-
-    def fix_section_number(self):
-        """ Concatenate lab and section numbers.
-        Probably should be part of or called from add_meetings. """
-        self.number =  ' '.join((num[1:] if len(num)>3 else num)
-                                for num in self.numberlist)
 
     def add_meetings(self, jsection):
         """ Parse a regblocks section into one or more periods and add them to

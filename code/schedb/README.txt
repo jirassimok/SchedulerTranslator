@@ -9,22 +9,8 @@ schedb.py currently contains the skeletons of the classes that represent the
 
 Current plan: Still use the old schedb classes, but with new algorithms.
 
-TODO: Add final steps: xml.ElementTree.tostring(xml.ElementTree.fromstring(str(schedb)))
 
-Previously, departments were built from per-term department lists and strings
-as they currently are.
-
-Course listings are used to get regblocks, and nothing more.
-    lesser priority: There should probably be a check for missing courses/regblocks.
-
-
-Courses are inserted with a department and course number.
-    regblocks["subject"]
-    regblocks["id"]
-
-
-I leave it up to the dept class or something above it to parse courses.
-
+TODO: WEED OUT SUMMER CLASSES AT THE HIGHEST POSSIBLE LEVEL: Schedb
 
 
 Top-down bits:
@@ -39,13 +25,18 @@ Schedb(termlist)
 
 A Term takes its string, and can be given its department list, which it turns
 into a dictionary of abbrevs and Depts.
-Term(termstring, deptlistjson)
+Term(termstring)
+Term.add_depts(deptlistjson)
 
 A Dept takes its name and abbrev, and can be given its course list, which it
 turns into a dictionary of course numbers and courses.
+Dept(name, abbrev)
+Dept.add_courses(courselistjson)
 
 A Course takes its (department,) name(,) and number, and can be given its
 regblocks, which it parses into its sections.
+Course(number, name)
+Course.add_regblock(regblockjson)
 
 A Section takes nothing, and can be given its regblocks, which it parses into
 itself and its periods.
@@ -55,6 +46,17 @@ Section.add_meetings(regblocks["section"])
 
 A Period takes all of its information and can be given nothing.
 Period(_type, instructor, meeting, crn)
+
+
+pager = Fetch(...)
+schedb = Schedb(pager.get()) TODO Fetch.get can not get terms right now
+
+for term in schedb.terms:
+    schedb.add_depts(pager.get(term.string))
+    for dept in term.depts:
+        dept.add_courses(pager.get(term, dept.abbrev))
+        for course in dept.courses:
+            course.add_regblocks(pager.get(term, dept.abbrev, course.number))
 
 
 # TODO NOTE: Currently, I could build the database without courses, then ...

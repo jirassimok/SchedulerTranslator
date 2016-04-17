@@ -18,6 +18,7 @@ matching variables here.
 """
 from time import strftime, strptime
 
+
 class Period(object):
     def __init__(self, _type, instructor, meeting, crn=''):
         # List sub-crns next to portion of class.
