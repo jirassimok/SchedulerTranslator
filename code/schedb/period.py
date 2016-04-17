@@ -22,7 +22,8 @@ from time import strftime, strptime
 class Period(object):
     def __init__(self, _type, instructor, meeting, crn=''):
         # List sub-crns next to portion of class.
-        self.type = _type + (" " + crn if crn else '')
+        self.type = _type  # type can not be modified
+        # Known possible values: Lecture, Lab, Conference
 
         professor = instructor["name"]
         professor_email = instructor["email"]  # May be None
@@ -35,9 +36,12 @@ class Period(object):
         else:
             self.professor_email = "look@it.up"
 
-        location  = meeting["location"].split(" ")
+        # TODO: Concatenating CRN to room number isn't the best solution, but...
+        # it's the best I've got right now.
+        location  = meeting["location"].split(" ") + ([str(crn)] if crn else [])
         self.building = location[0]
-        self.room = " ".join(location[1:]) if location[1:] else "[ERROR]"
+        self.room = ((" ".join(location[1:]) if location[2:] else "[ERROR]"))
+        # The test uses [2:] because attaching the crn nearly guarantees [1:]
 
         days = meeting["daysRaw"]
         self.days = self.fix_days(meeting["daysRaw"])
