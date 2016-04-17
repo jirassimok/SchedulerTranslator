@@ -27,7 +27,7 @@ class Period(object):
 
         professor = instructor["name"]
         professor_email = instructor["email"]  # May be None
-        self.professor = professor.split(",")[0] # Last name only*
+        self.professor = professor.split(",")[0]  # Last name only*
         self.professor_sort_name = professor
         if professor == "Not Assigned":
             self.professor_email = "N/A"
@@ -40,10 +40,9 @@ class Period(object):
         # it's the best I've got right now.
         location  = meeting["location"].split(" ") + ([str(crn)] if crn else [])
         self.building = location[0]
-        self.room = ((" ".join(location[1:]) if location[2:] else "[ERROR]"))
+        self.room = (" ".join(location[1:]) if location[2:] else "[ERROR]")
         # The test uses [2:] because attaching the crn nearly guarantees [1:]
 
-        days = meeting["daysRaw"]
         self.days = self.fix_days(meeting["daysRaw"])
         self.starts = self.fix_time(meeting["startTime"], default="8:00AM")
         self.ends = self.fix_time(meeting["endTime"], default="4:50PM")
@@ -60,7 +59,7 @@ class Period(object):
                 + self.ends + '" building="' + self.building + '" room="'
                 + self.room + '"></period>')
 
-    def fix_days(self, raw_days):
+    def fix_days(self, raw_days, default="wed"):
         """ Parse a list of days in the format "MTWRF" into the format
         "mon,tue,wed,thu,fri".
 
@@ -70,7 +69,10 @@ class Period(object):
         timetable = {'M': 'mon', 'T': 'tue', 'W': 'wed', 'R': 'thu', 'F': 'fri'}
         days = []
         for day in raw_days:
-            days.append(timetable[day])
+            try:
+                days.append(timetable[day])
+            except KeyError:  # a nonsense day was in the json
+                self.professor += "[ERROR: bad day " + day + "]"
         return ','.join(days)
 
     def fix_time(self, time, *, default="12:00PM"):
@@ -87,7 +89,7 @@ class Period(object):
         try:
             return strftime("%I:%M%p", strptime(str(time), "%H%M")).lstrip("0")
         except ValueError:  # time didn't match format string
-            self.professor += "[ERROR: Bad time]"
+            self.professor += "[ERROR: bad time " + str(time) + "]"
             return default
         # Potential bug: classes starting after 4:50 with invalid end times will
         # end before they begin.
