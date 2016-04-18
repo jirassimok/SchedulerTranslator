@@ -81,6 +81,8 @@ class Course(object):
             self.add_section(regblock, jsections)
         self.sections.sort()  # put them in order - enabled by Section.__lt__()
 
+        self.course_desc = sections[0]["description"]
+
     def add_section(self, crns, jsections):
         """ Parse a sections json and a list of CRNs into one of this course's
         sections and its periods.
@@ -105,9 +107,10 @@ class Course(object):
                     self.sections.append(main_section)
             new_section.add_meetings(jsection)
 
-        # Concatenate lab and lecture section numbers
-        # TODO: Check if the section is correctly-populated first.
+        # Check if the section is correctly-populated first.
+        # Because of the first_subsection flag, this should never execute.
         if not new_section.is_valid():
-            new_section.add_main_info
+            new_section.add_main_info(jsections[crns[0]])
+
         if new_section not in self.sections:  # prevent duplicate sections
             self.sections.append(new_section)
