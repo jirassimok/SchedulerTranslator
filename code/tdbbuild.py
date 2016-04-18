@@ -90,7 +90,7 @@ def write_page(fetch, term=None, dept=None, num=None,
                     filepath += "/regblocks"
     filepath += ".json"
     # Get the page.
-    print("Fetching:", filepath)
+    # print("Fetching:", filepath)
     page = fetch.get(term, dept, num, rb=regblocks, delay=delay)
     # Write it to the file.
     with open(filepath, "w+") as file:
@@ -120,7 +120,7 @@ def write_dept(fetch, term, dept,
         maybe_print_now(verbose, "\tFetching " + dept + cnum + " Regblocks...",
                   sep='', end='')
         # Write regblocks
-        write_page(fetch, term, dept, cnum, True,
+        write_page(fetch, term, dept, cnum,
                    in_dir=in_dir, delay=delay)
         maybe_print_now(verbose, "\tSuccess")
         if cinfo:
