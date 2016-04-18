@@ -3,10 +3,13 @@
 /io/*
 
 # The schedular need not be included
-/Scheduler/
+/Scheduler/*
+/war/*
 
 # Things explicitly not to include
 not_in_git/*
+/code/testing/*
+/TESTGROUNDS/*
 
 # PyCharm directories
 **/__pycache__/*
