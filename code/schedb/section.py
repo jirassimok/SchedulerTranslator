@@ -46,15 +46,12 @@ class Section(object):
 
     def __lt__(self, other):
         """ A section is less than another if its number is lower.
-
-        @param other: The object to compare to.
-        @return True if self.number<other.number, false otherwise.
         @raise TypeError if other is not a Section.
         """
         if isinstance(other, Section):
             return self.number < other.number
         else:
-            return not (self > other)  # bad shortcut to unorderable TypeError
+            return not self > other  # bad shortcut to unorderable TypeError
 
     def __str__(self):
         string = ['<section crn="', self.crn, '" number="', self.number,
@@ -65,8 +62,12 @@ class Section(object):
         for p in self.periods:
             string.append(str(p))
         string.append('</section>')
-        stringlist = map(str, string)
+        stringlist = [str(s) for s in string]
         return ''.join(stringlist)
+
+    def is_valid(self):
+        """ True if all attributes are truthy. """
+        return all(self.__dict__.values())
 
     @staticmethod
     def fix_term(parts_of_term):
