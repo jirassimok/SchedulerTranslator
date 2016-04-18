@@ -143,8 +143,9 @@ class Section(object):
         instructor = jsection["instructor"][0]
         for meeting in jsection["meetings"]:
             period = Period(_type, instructor, meeting, crn)
-            if Period:
-                self.periods.append(period)
+            if not period.days:
+                period.days = "wed"
+            self.periods.append(period)
 
         # print("PERIOD", jsection["sectionNumber"])
 
