@@ -11,28 +11,82 @@ for course registration.
 
 """
 from .department import Dept
+from time import strftime
 
 
 class Schedb(object):
-    def __init__(self):
+    def __init__(self, termsjson=None):
         self.terms = []  # List because nothing to index by. - could be a set
         self.depts = {}
+        self.xmlns = "https://scheduler.wpi.edu"
+        self.schemaLocation = "https://scheduler.wpi.edu schedb.xsd"
 
-    def add_terms(self, json_terms):
-        """ Add a list of terms to this schedb. Prevents addition of duplicates.
+        if termsjson:
+            self.add_terms(termsjson)
 
-        @param json_terms: A term list json.
+    def __str__(self):
+        string = ['<?xml version="1.0" encoding="UTF-8"?>\n'
+                  '<schedb xmlns="', self.xmlns, '" '
+                  'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+                  'xsi:schemaLocation="', self.schemaLocation, '" '
+                  'generated="', strftime("%a %b %d %H:%M:%S %Y").upper(), '" '
+                  'minutes-per-block="30">\n']
+        for dept in self.depts.values():
+            string.append(str(dept))
+            string.append("\n")
+        string.append("</schedb>")
+        return ''.join(string)
+
+    def add_terms(self, termsjson):
+        """ Add a list of terms to this schedb. Prevents duplicates.
+        Currently ignores summer.
+        @param termsjson: A term list json.
         """
-        for term in json_terms:
+        for term in termsjson:
             termstring = term["id"]  # could also use term["title"]
-            if termstring not in self.terms:
+            if termstring not in self.terms and "Summer" not in termstring:
                 self.terms.append(termstring)
 
-    def add_depts(self, json_dept_list):
-        """ Add a list of departments to this schedb.
+    def add_depts(self, deptlistjson):
+        """ Add a list of departments to this schedb. Prevents duplicates.
 
-        @param json_dept_list: A department list json.
+        @param deptlistjson: A department list json.
         """
-        for dept in json_dept_list:
+        for dept in deptlistjson:
             abbrev = dept["id"]  # Could use short, but id is more likely unique
             self.depts.setdefault(abbrev, Dept(abbrev, dept["long"]))
+
+    def add_courses_to_dept(self, courselistjson, dept):
+        """ Add the course listings in the given json to the appropriate dept in
+        this Schedb's depts.
+
+        @param courselistjson: A course list json.
+        @param dept: The abbreviation for the department the course is in.
+        """
+        self.depts[dept].add_courses(courselistjson)
+
+    def add_regblocks(self, regblocks, dept, coursenum):
+        """ Add the course/sections/periods represented by the given regblocks
+        to the appropriate department/course in this Schedb.
+
+        @param regblocks: The regblocks json to add.
+        @param dept: The abbreviation for the department the course is in.
+        @param coursenum: The course's number in its department.
+        """
+        self.depts[dept].add_regblocks(regblocks, str(coursenum))
+
+    ''' I don't need to worry about mixed departments (yet, at least).
+    def add_courses(self, courselistjson, *, dept=None):
+        """ Add the courses listings in the given json to this Schedb's depts.
+
+        @param courselistjson: A course list json.
+        @param singledept: If True, all courses are assumed to be in the same
+                           department.
+        """
+        if singledept:
+            self.add_courses_to_dept(courselistjson)
+        else:
+            for course in courselistjson:
+                dept = self.depts[courselistjson["subectId"]]
+                dept.add_course(course)
+    '''
