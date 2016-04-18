@@ -58,7 +58,7 @@ def concatenate_regblocks(pager, output_file, verbose=True):
                 courseregblocks = pager.get(term, dept, cnum, rb=True)
                 regblocks.append(courseregblocks)
                 maybe_print_now(verbose, " Success")
-
+    # ',\n' would be better for joining regblocks, but I'm done with this file.
     regblocks_str = '"regblocks":[' + ','.join(regblocks) + ']'
     departments_str = '"departments":[' + ','.join(departments) + ']'
     output_json = '{' + regblocks_str + ',' + departments_str + '}'
