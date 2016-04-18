@@ -10,6 +10,8 @@ Running this file will read all departments and courses in the local database
 and regblocks in to ../io/regblockslist.json, then read that and write a schedb
 to ../io/new_v1.1.schedb.
 
+ONLY RUN THIS FILE IN "get" MODE.
+
 """
 # Imports from libraries.
 import sys
@@ -30,6 +32,8 @@ IO_PATH = "../io"
 # There are many better ways to do this, but this is not my top priority.
 if len(sys.argv)>1:  # If command line arguments found...
     RUN_MODE = sys.argv[1]
+    if RUN_MODE == "parse":
+        sys.exit()
     if len(sys.argv)>2:
         hostdb.PORT = sys.argv[2]
         PORT = sys.argv[2]

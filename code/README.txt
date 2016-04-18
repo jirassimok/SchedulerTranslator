@@ -4,9 +4,39 @@ Retrieves and translates the new Scheduler's database from
 wpi.collegescheduler.com and writes it to a local database, which can be
 translated into the old scheduler's schedb xml format.
 
+Current version: 2.0
+TODO: Improve ease of use - stop using testmain.py as the main file.
 
 To get a database from the server, run with:
 Main.py get DATABASE_PATH
+
+To transcribe the database to an xml:
+1. Make the code directory the working directory.
+
+2. Enter a python interpreter.
+
+3. Run this code:
+>>> import hostdb
+>>> hostdb.PORT = 8001
+>>> hostdb.DATABASE_PATH = "../DATABASE"  # set to the path to your database dir
+>>> hostdb.run_database_server()
+
+3. Run testing/testmain.py as follows, with FILEPATH being the path to testmain
+   relative to the database directory.
+   a. IPython: %run FILEPATH
+   b. Standard interpreter: exec(open("FILEPATH").read(), globals())
+
+4. Run this code: (change the filename as appropriate)
+>>> hostdb.close_database_server()
+>>> with open("new_v1.1.schedb", "w+") as schedbfile:
+...     schedbfile.write(str(schedb))
+
+
+######## ######## ######## ######## ######## ######## ######## ########
+
+
+Former isntructions: Besides the transcription instructions, these may still
+hold. The transcription isntructions are likely to fail due to code changes.
 
 To transcribe the database to an xml, run with:
 Main.py parse PORT DATABASE_PATH IO_PATH
