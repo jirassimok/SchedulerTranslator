@@ -31,11 +31,21 @@ class Schedb(object):
                   'xsi:schemaLocation="', self.schemaLocation, '" '
                   'generated="', strftime("%a %b %d %H:%M:%S %Y").upper(), '" '
                   'minutes-per-block="30">\n']
-        for dept in self.depts.values():
+        depts = self.sort_depts()
+
+        for dept in depts:
             string.append(str(dept))
             string.append("\n")
         string.append("</schedb>")
         return ''.join(string)
+
+    def sort_depts(self):
+        orderlist = Dept.get_order()  # The grand sorting list for departments.
+        depts = []
+        for key in self.depts.keys():
+            if key in orderlist:
+                depts.append(self.depts[key])  # filter out invalid departments
+        return sorted(depts)  # works because Dept.__lt__ is implemented.
 
     def add_terms(self, termsjson):
         """ Add a list of terms to this schedb. Prevents duplicates.
