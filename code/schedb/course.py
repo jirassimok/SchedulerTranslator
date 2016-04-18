@@ -73,8 +73,9 @@ class Course(object):
         regblocks = regblocksjson["registrationBlocks"]
         sections = regblocksjson["sections"]
 
-        regblocks = [regblock["sectionIds"] for regblock in regblocks if
-                     regblock["enabled"] == True]
+        # filter removed because full courses are disabled
+        regblocks = [regblock["sectionIds"] for regblock in regblocks]
+                    # if regblock["enabled"] == True]
         jsections = {section["id"]: section for section in sections}
 
         for regblock in regblocks:  # A regblock is a list of crns.
