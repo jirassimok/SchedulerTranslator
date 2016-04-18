@@ -5,8 +5,6 @@ Author: Jacob Komissar
 Date: 2016-04-12
 
 Class to represent departments.
-
-Very much incomplete.
 """
 from .course import Course
 
@@ -19,7 +17,7 @@ class Dept(object):
 
     def __str__(self):
         string = ['<dept abbrev="', self.abbrev, '" name="', self.name, '">\n']
-        for c in self.courses:
+        for c in self.courses.values():
             string.append(str(c))
             string.append("\n")
         string.append("</dept>")
@@ -29,22 +27,33 @@ class Dept(object):
         """Departments with the same abbreviation are equal."""
         return type(self) is type(other) and self.abbrev == other.abbrev
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    '''
+    def add_course(self, coursejson):
+        """ Create a course and add it to this department's courses.
+        Does not allow duplicate courses.
 
-    def add_course(self, regblocks, course=None):
-        """ Add a course to the department.
-
-        @param regblocks: The regblocks json for the course.
-        @param course: The course json
+        @param coursejson: The course json for the course.
         """
-        if not course:
-            self.add_course_by_regblocks(self, regblocks)
-        else:
-            raise NotImplementedError("Dept.add_course can not currently take "
-                                      "a course json, as they are unnecessary "
-                                      "and would require nearly twice as large "
-                                      "a database.")
+        number = coursejson["number"]
+        self.courses.setdefault(number, Course(number, coursejson["name"],
+                                               dept=self.abbrev))
+    '''
 
-    def add_course_by_regblocks(self, regblocks):
-        pass
+    def add_courses(self, courselistjson):
+        """ Add a list of courses to this department. Does not allow duplicates.
+
+        @param courselistjson: A course list json.
+        """
+        for course in courselistjson:
+            number = course["number"]
+            self.courses.setdefault(number, Course(number, course["title"],
+                                                   dept=self.abbrev))
+
+    def add_regblocks(self, regblocks, coursenum):
+        """ Add the course/sections/periods represented by the given regblocks
+        to the appropriate course in this department.
+
+        @param regblocks: The regblocks json to add.
+        @param coursenum: The course's index in this department's course dict.
+        """
+        self.courses[str(coursenum)].add_regblocks(regblocks)

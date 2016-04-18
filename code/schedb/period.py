@@ -23,9 +23,9 @@ class Period(object):
     def __init__(self, _type, instructor, meeting, crn=''):
         # List sub-crns next to portion of class.
         self.type = _type  # type can not be modified
-        # Known possible values: Lecture, Lab, Conference
+        # Known possible values: Lecture, Lab, Conference, Web
 
-        professor = instructor["name"]
+        professor = instructor["name"]  # ["id"] also works
         professor_email = instructor["email"]  # May be None
         self.professor = professor.split(",")[0]  # Last name only*
         self.professor_sort_name = professor
@@ -38,18 +38,23 @@ class Period(object):
 
         # TODO: Concatenating CRN to room number isn't the best solution, but...
         # it's the best I've got right now.
-        location  = meeting["location"].split(" ") + ([str(crn)] if crn else [])
+        location = meeting["location"].split(" ") + ([str(crn)] if crn else [])
         self.building = location[0]
         self.room = (" ".join(location[1:]) if location[2:] else "[ERROR]")
         # The test uses [2:] because attaching the crn nearly guarantees [1:]
 
         self.days = self.fix_days(meeting["daysRaw"])
-        self.starts = self.fix_time(meeting["startTime"], default="8:00AM")
-        self.ends = self.fix_time(meeting["endTime"], default="4:50PM")
+        self.starts = self.fix_time(meeting["startTime"], default="7:50AM")
+        self.ends = self.fix_time(meeting["endTime"], default="7:50AM")
 
-        # * The new scheduler uses the same value for instructor id and name
-        #   And id might not be a sort name, anyway. But maybe...
-        # TODO: Possibly use instructor["id"] for professor_sort_name
+        # TODO: Deal with missing information more elegantly, esp. in Period.
+        # Poorly deal with missing information.
+        if meeting["location"] is None:
+            self.building = "NONE"
+            self.room = str(crn) if crn else "?"
+
+        if not meeting["daysRaw"]:
+            self.days = "wed"
 
     def __str__(self):
         return ('<period type="' + self.type + '" professor="' + self.professor
@@ -78,6 +83,8 @@ class Period(object):
     def fix_time(self, time, *, default="12:00PM"):
         """ Parse a time in "%H%M" format to "%I:%M%p" format.
 
+        The default should always be specified.
+
         Examples:
          930 ->  "9:30AM"
         2200 -> "10:00PM"
@@ -89,7 +96,7 @@ class Period(object):
         try:
             return strftime("%I:%M%p", strptime(str(time), "%H%M")).lstrip("0")
         except ValueError:  # time didn't match format string
-            self.professor += "[ERROR: bad time " + str(time) + "]"
+            self.professor += " [ERROR: bad time " + str(time) + "]"
             return default
         # Potential bug: classes starting after 4:50 with invalid end times will
         # end before they begin.
