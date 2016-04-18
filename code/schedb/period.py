@@ -44,8 +44,8 @@ class Period(object):
         # The test uses [2:] because attaching the crn nearly guaranteses [1:]
 
         self.days = self.fix_days(meeting["daysRaw"])
-        self.starts = self.fix_time(meeting["startTime"], default="7:50AM")
-        self.ends = self.fix_time(meeting["endTime"], default="7:50AM")
+        self.starts = self.fix_time(meeting["startTime"])  # , default="7:50AM")
+        self.ends = self.fix_time(meeting["endTime"])  # , default="7:50AM")
 
         # DONE: Deal with missing information more elegantly, esp. in Period.
         # Poorly deal with missing information.
@@ -99,6 +99,6 @@ class Period(object):
             return strftime("%I:%M%p", strptime(str(time), "%H%M")).lstrip("0")
         except ValueError:  # time didn't match format string
             # self.professor += " [ERROR: bad time " + str(time) + "]"
-            return "?"
+            return default
         # Potential bug: classes starting after 4:50 with invalid end times will
         # end before they begin.
