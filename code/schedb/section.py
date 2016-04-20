@@ -119,13 +119,6 @@ class Section(object):
 
         # print("SECTION DATA FOR", jsection["id"])
 
-        # TODO: Remove the next five lines and previous comment string.
-        # These lines added for testing purposes.
-        self.seats = str(jsection["seatsCapacity"])
-        self.availableseats = str(jsection["openSeats"])
-        self.max_waitlist = str(jsection["waitlist"])
-        self.actual_waitlist = str(jsection["waitlistOpen"])
-
     def add_meetings(self, jsection):
         """ Parse a regblocks section into one or more periods and add them to
         this Section.
@@ -156,9 +149,10 @@ class Section(object):
         # So far, this properly constructs a period. It still needs to update
         # this section's (available)seats and waitlists.
 
-        '''
-        self.seats = str(seats)  # Add from smallest regblock
-        self.availableseats = str(availableseats)  # Add from same as above
-        self.max_waitlist = str(max_waitlist)  # Add from Smallest regblock
-        self.actual_waitlist = str(actual_waitlist)  # Add from same as above
-        '''
+        # Use the seats from the smallest subsection.
+        seats = jsection["seatsCapacity"]
+        if not self.seats or seats < self.seats:
+            self.seats = str(jsection["seatsCapacity"])
+            self.availableseats = str(jsection["openSeats"])
+            self.max_waitlist = str(jsection["waitlist"])
+            self.actual_waitlist = str(jsection["waitlistOpen"])
