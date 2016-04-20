@@ -34,8 +34,15 @@ To transcribe the database to an xml:
 
 ######## ######## ######## ######## ######## ######## ######## ########
 
+Changes to old Scheduler required to make new data work fully:
+Add a flag that makes sections un-addable, or add "subsections" or "subclasses".
+Subclasses might be easiest/best: Within a course, have separate areas for
+lectures and labs etc, and allow one from each area to be selected.
 
-Former isntructions: Besides the transcription instructions, these may still
+######## ######## ######## ######## ######## ######## ######## ########
+
+
+Former instructions: Besides the transcription instructions, these may still
 hold. The transcription isntructions are likely to fail due to code changes.
 
 To transcribe the database to an xml, run with:
