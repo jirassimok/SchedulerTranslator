@@ -41,8 +41,8 @@ class Dept(object):
 
         BB, BCB, CH, CS, GE, MA, PH, AE, AREN, BME, CE, CHE, ECE, ES, FP, ME,
         RBE, AB, CN, GN, SP, AR, EN, HI, HU, MU, PY, RE, WR, ECON, ENV, GOV,
-        PSY, SD, SOC, SS, ACC, BUS, ETR, FIN, MIS, MKT, OBC, OIE, AS, DS, FY, ID,
-        IMGD, INTL, ISE, MFE, ML, MME, MPE, MTE, NSE, PE, SEME, STS, SYS
+        PSY, SD, SOC, SS, ACC, BUS, ETR, FIN, MIS, MKT, OBC, OIE, AS, DS, FY,
+        ID, IMGD, INTL, ISE, MFE, ML, MME, MPE, MTE, NSE, PE, SEME, STS, SYS
 
         Alternatively, sort Depts in Schedb.
         [self.depts[abbr] for abbr in order if self.depts.get(abbr) is not None]
@@ -52,10 +52,8 @@ class Dept(object):
         """
         if isinstance(other, Dept):
             return self.abbrev < other.abbrev
-            '''
-            (Dept.orderlist.index(self.abbrev)
-                < Dept.orderlist.index(other.abbrev))
-            '''
+            # (Dept.orderlist.index(self.abbrev)
+            #     < Dept.orderlist.index(other.abbrev))
         else:
             return not self > other  # bad shortcut to unorderable TypeError
 

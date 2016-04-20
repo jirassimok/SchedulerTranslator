@@ -45,7 +45,7 @@ class Course(object):
         for s in self.sections:
             string.append(str(s))
         string.append('</course>')
-        stringlist = map(str, string)
+        stringlist = [str(s) for s in string]
         return ''.join(stringlist)
 
     ''' Probably unnecessary, as I can just do "in self.sections".
