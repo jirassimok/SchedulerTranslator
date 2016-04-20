@@ -37,7 +37,7 @@ class Schedb(object):
             string.append(str(dept))
             string.append("\n")
         string.append("</schedb>")
-        return ''.join(string)
+        return ''.join(string).replace("<br />", " ").replace("&", "&amp;")
 
     def sort_depts(self):
         orderlist = Dept.get_order()  # The grand sorting list for departments.

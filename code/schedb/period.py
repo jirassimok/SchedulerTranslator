@@ -57,12 +57,14 @@ class Period(object):
             self.days = "?"
 
     def __str__(self):
-        return ('<period type="' + self.type + '" professor="' + self.professor
-                + '" professor_sort_name="' + self.professor_sort_name
-                + '" professor_email="' + self.professor_email + '" days="'
-                + self.days + '" starts="' + self.starts + '" ends="'
-                + self.ends + '" building="' + self.building + '" room="'
-                + self.room + '"></period>')
+        string = ['<period type="', self.type, '" professor="', self.professor,
+                  '" professor_sort_name="', self.professor_sort_name,
+                  '" professor_email="', self.professor_email,
+                  '" days="', self.days, '" starts="', self.starts,
+                  '" ends="', self.ends, '" building="', self.building,
+                  '" room="', self.room, '"></period>']
+        stringlist = [str(s) for s in string]
+        return ''.join(stringlist)
 
     def fix_days(self, raw_days, default="wed"):
         """ Parse a list of days in the format "MTWRF" into the format
@@ -93,7 +95,7 @@ class Period(object):
 
         @param time: An integer representation of a time in 24-hour format.
         @param default: The value to use in the event of an error.
-        @return: A formatted time string or "?".
+        @return: A formatted time string or default.
         """
         try:
             return strftime("%I:%M%p", strptime(str(time), "%H%M")).lstrip("0")
