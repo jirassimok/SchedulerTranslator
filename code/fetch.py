@@ -10,16 +10,6 @@ Program to get WPI Course Planner pages as strings.
 
 Departments are stored as dictionaries in a list json.
 
-
-ESSENTIAL:
-
-CERTAIN STRINGS MUST BE REMOVED BEFORE USE.
-As this is the one place where all data passes through, I'll do it here.
-
-Strings to remove: "<br />", "&"
-str.replace('<br />', '').replace('&', '')
-
-
 """
 import requests
 import re
@@ -85,6 +75,8 @@ class Fetch(object):
                 # print("Login failed, retrying")
                 # time.sleep(5)
                 # continue
+        self.sid = ""
+        self.pin = ""
         r = s.get(urls['sched_redirect'],
                   headers={'referer': urls["registration"]})
         s.get(re.findall(r'https://wpi.collegescheduler.com/'
@@ -156,7 +148,7 @@ class Fetch(object):
 
     @staticmethod
     def clean_page(page):
-        return page.replace('<br />', ' ').replace('&', 'and'
+        return page.replace('<br />', ' ').replace('&', '&amp;'
             ).encode("ascii", errors="ignore").decode("ascii")
         # .replace("<", "&lt;")
         # .replace('&', '&amp;')
