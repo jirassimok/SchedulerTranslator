@@ -107,9 +107,11 @@ class Section(object):
         termtuple = self.fix_term(jsection["partsOfTerm"])
         self.term = termtuple[0]
         self.partOfTerm = termtuple[1]
-        self.crn = jsection["id"]
-        # TODO Possibly switch to use crn from lab period - but which if more?
-        # TODO VERY IMPORTANT: Find a way to store lab/conference CRNs. Issues:
+        # self.crn = jsection["id"]
+
+        # DONE Possibly switch to use crn from lab period - but which if more?
+        # TODO VERY IMPORTANT: Find a better way to store lab/conference CRNs...
+        # Issues:
         # We could use the lab period CRN, which would work because we have the
         # lectures also listed as seaprate courses, but this approach would fail
         # for courses with both a lab and a conference, because those have 3
@@ -152,6 +154,7 @@ class Section(object):
         # Use the seats from the smallest subsection.
         seats = jsection["seatsCapacity"]
         if not self.seats or seats < self.seats:
+            self.crn = crn
             self.seats = str(jsection["seatsCapacity"])
             self.availableseats = str(jsection["openSeats"])
             self.max_waitlist = str(jsection["waitlist"])
