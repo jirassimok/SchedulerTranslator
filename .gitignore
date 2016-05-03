@@ -1,10 +1,12 @@
 # The database need not be updated.
 /DATABASE/*
+/DATABASE*/*
 /io/*
 
 # The schedular need not be included
 /Scheduler/*
 /war/*
+war.zip
 
 # Things explicitly not to include
 not_in_git/*
