@@ -7,6 +7,29 @@ translated into the old scheduler's schedb xml format.
 Current version: 2.0
 TODO: Improve ease of use - stop using testmain.py as the main file.
 
+TODO: Run database server without changing directories - requires many changes.
+TODO: Run from parent directory, so this can be a child of the real scheduler.
+
+TODO: Eliminate the horror that is partial_parse.py. With it, remove utility.py.
+
+TODO: Fix file layout to the following:
+ScheduleTranslator/
+|-- README.txt
+|-- main.py
+|-- hostdb.py
+|-- tdbbuild.py (rename to dbbuild.py)
+|-- fetch.py (possibly rename to pager.py)
+|-- schedb/
+|   |-- __init__.py
+|   |-- schedb.py
+|   |-- department.py
+|   |-- course.py
+|   |-- section.py
+|   +-- period.py
+|-- DATABASE/ (these two directories also need gitignores on their contents)
++-- OUTPUT/ (needs a better name)
+
+
 To get a database from the server, run with:
 Main.py get DATABASE_PATH
 

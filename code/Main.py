@@ -50,13 +50,11 @@ IO_PATH = IO_PATH.rstrip("/")
 JSON_FILE = IO_PATH + "/regblockslist.json"
 SCHEDB_FILE = IO_PATH + "/new_v1.1.schedb"
 
-# TODO: Create a set of classes to represent the json structure.
+# DONE: Create a set of classes to represent the json structure.
 # Using algorithms similar to the web->file database reader,
 # Make a web->object database reader.
-# TODO: Then pass a schedbparse to the schedb to parse.
-# TODO: Fix labs/conferences AFTER classes get me easy access to all the data.
-
-# TODO: MAJOR ISSUES: Can't parse anything including "null". (explicitly)
+# DONE: Then pass a schedbparse to the schedb to parse.
+# DONE: Fix labs/conferences AFTER classes get me easy access to all the data.
 
 # TODO: Make a version of Fetch.get that gets from the file system directly.*
 # This would allow unicode to be read much more nicely, I am fairly certain.

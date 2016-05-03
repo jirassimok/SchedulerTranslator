@@ -18,6 +18,7 @@ import json  # Probably should be using requests.Response.json() instead.
 import getpass
 
 
+# TODO: Change local from a boolean to a base filepath for the database.
 class Fetch(object):
     regblocks = True  # A constant for use as the "rb" parameter.
 
