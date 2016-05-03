@@ -21,7 +21,7 @@ import getpass
 class Fetch(object):
     regblocks = True  # A constant for use as the "rb" parameter.
 
-    def __init__(self, *, readfile=None, local=False, offline=False, port=8000):
+    def __init__(self, *, readfile=None, local=False, port=8000):
         # self.page = None  # A page retrieved with set_page().
         self.term = ""  # The current term.
         self.termlist = []
@@ -75,15 +75,65 @@ class Fetch(object):
                 # print("Login failed, retrying")
                 # time.sleep(5)
                 # continue
-        self.sid = ""
-        self.pin = ""
         r = s.get(urls['sched_redirect'],
                   headers={'referer': urls["registration"]})
-        s.get(re.findall(r'https://wpi.collegescheduler.com/'
-                         r'index.aspx\?ticket=[^\'"]*',
-                         r.text)[0])
+
+        r = s.get(re.findall(r'https://wpi\.collegescheduler\.com/'
+                             r'index\.aspx\?ticket=[^\'"]*',
+                             r.text)[0])
+
         self.session = s
+        self.show_full_courses(r.text)
+
         return True  # So the function always returns.
+
+    def show_full_courses(self, entry_page):
+        """ Sets the scheduler to show courses that are full.
+        @param entry_page The page recieved upon entry to the scheduler.
+        """
+        # Everything from here to the actual request info could be replaced by:
+        # field = re.search(r'<input name="__RequestVerificationToken"[^>]*/>',
+        #                   entry_page)
+        # token = re.search(r'(?<=value=")[^"]+(?=")', field)
+
+        regex = r'<input name="__RequestVerificationToken"[^>]*/>'
+        token_html_inputs = re.findall(regex, entry_page)
+
+        regex = r'(?<=value=")[^"]+(?=")'
+        tokens = []
+        for field in token_html_inputs:
+            matches = re.findall(regex, field)
+            for match in matches:
+                tokens.append(match)
+
+        # Ensure that only one token is good to use.
+        # Only the final else should ever actually run.
+        if len(tokens)==0:
+            raise Exception("Verification token not found"
+                            "- could not get all courses")
+            # TODO: Implement an option to ignore this error and proceed without full courses.
+        elif len(tokens) > 1:
+            print("Multiple verification tokens found, please choose one:")
+            for i, token in enumerate(tokens):
+                print(i, ": ", token, sep="")
+            choice = input("Choose one of the numbers on the left: ")
+            while choice not in [str(i) for i in range(len(tokens))]:
+                choice = input("Choose one of the numbers on the left: ")
+            token = tokens[int(choice)]
+        else:  # one token
+            token = tokens[0]
+
+        headers = {
+            "X-XSRF-Token": token,
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/json"
+            }
+        url = "https://wpi.collegescheduler.com/api/coursestatuses/OpenAndFull/selected"
+        body = ('{id: "OpenAndFull", title: "Open & Full", '
+                'selected: true, code: "OpenAndFull"}')
+
+        self.session.put(url, body, headers=headers)
+
 
     def set_terms(self, *termstrings):
         """ Sets the current term, and adds additional terms to termlist.
@@ -148,8 +198,8 @@ class Fetch(object):
 
     @staticmethod
     def clean_page(page):
-        return page.replace('<br />', ' ').replace('&', '&amp;'
-            ).encode("ascii", errors="ignore").decode("ascii")
+        return (page.replace('<br />', ' ').replace('&', '&amp;')
+                .encode("ascii", errors="ignore").decode("ascii"))
         # .replace("<", "&lt;")
         # .replace('&', '&amp;')
         # .replace(u"\u2019", "'")
