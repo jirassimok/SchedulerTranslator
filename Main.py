@@ -115,7 +115,6 @@ section: lots
 '''
 if RUN_MODE == "get":
     # Setup for pager
-    READING_DATABASE = True  # Should always be true as of 2016-04-12
     DATABASE_IS_LOCAL = False
 
     # Setup for database retrieval
@@ -125,7 +124,6 @@ if RUN_MODE == "get":
     BUILDING_JSON = False
     BUILDING_SCHEDB = False
 elif RUN_MODE == "parse":
-    READING_DATABASE = True  # Should always be true as of 2016-04-12
     DATABASE_IS_LOCAL = True
 
     WRITING_LOCAL_DATABASE = False
@@ -146,24 +144,23 @@ def get_and_list_depts(_schedb, _pager):
 
 
 schedb = Schedb()
-if READING_DATABASE:
-    pager = Fetch(local=DATABASE_IS_LOCAL, port=PORT)  # readfile=None
-    print("Pager initialized")
-    # pager.set_terms("Fall%202016")
-    pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
-    if DATABASE_IS_LOCAL:
-        hostdb.run_database_server()
+pager = Fetch(local=DATABASE_IS_LOCAL, port=PORT)  # readfile=None
+print("Pager initialized")
+# pager.set_terms("Fall%202016")
+pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
+if DATABASE_IS_LOCAL:
+    hostdb.run_database_server()
 
-if READING_DATABASE and BUILDING_JSON:
+if BUILDING_JSON:
     partial_parse.concatenate_regblocks(pager, JSON_FILE, verbose=False)
 if BUILDING_SCHEDB:
     partial_parse.obs_main_populate_schedb(
         schedb, JSON_FILE, SCHEDB_FILE)
 
-if READING_DATABASE and WRITING_LOCAL_DATABASE:  # Read the external database,
+if WRITING_LOCAL_DATABASE:  # Read the external database,
     term_write_loop(pager, prompt=False)  # and write it to the local database.
 
-if READING_DATABASE and DATABASE_IS_LOCAL:
+if DATABASE_IS_LOCAL:
     hostdb.close_database_server()  # Stop the database server.
 
 '''# This is the code I'm currently working on.
