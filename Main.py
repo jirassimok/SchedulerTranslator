@@ -43,8 +43,7 @@ if len(sys.argv)>1:  # If command line arguments found...
                 IO_PATH = sys.argv[4]
 
 else:
-    RUN_MODE = "unspecified"
-    PORT = 8000
+    raise Exception('No run mode specified.')
 
 IO_PATH = IO_PATH.rstrip("/")
 JSON_FILE = IO_PATH + "/regblockslist.json"
@@ -113,64 +112,22 @@ course: schedb has min-/max-credits and grade-type
 section: lots
 
 '''
-if RUN_MODE == "get":
-    # Setup for pager
-    DATABASE_IS_LOCAL = False
-
-    # Setup for database retrieval
-    WRITING_LOCAL_DATABASE = True
-
-    # Setup for file-reading/writing
-    BUILDING_JSON = False
-    BUILDING_SCHEDB = False
-elif RUN_MODE == "parse":
-    DATABASE_IS_LOCAL = True
-
-    WRITING_LOCAL_DATABASE = False
-
-    BUILDING_JSON = True
-    BUILDING_SCHEDB = True
-elif RUN_MODE == "unspecified":
-    raise Exception('No run mode specified.')
-else:
+if RUN_MODE != "get" and RUN_MODE != "parse":
     raise Exception('Invalid run mode: "' + RUN_MODE + '"')
 
-
-def get_and_list_depts(_schedb, _pager):
-    depts = _pager.get_json(pager.term)
-    _schedb.add_depts(depts)
-    for d, D in _schedb.departments.items():
-        print(d, "\t", D.abbrev, "\t", D.name, sep='')
-
-
-schedb = Schedb()
-pager = Fetch(local=DATABASE_IS_LOCAL, port=PORT)  # readfile=None
+pager = Fetch(local=(RUN_MODE == "parse"), port=PORT)  # readfile=None
 print("Pager initialized")
 # pager.set_terms("Fall%202016")
 pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
-if DATABASE_IS_LOCAL:
-    hostdb.run_database_server()
 
-if BUILDING_JSON:
+if RUN_MODE == "get":
+    # Read the external database and write it to the local database.
+    term_write_loop(pager, prompt=False)
+
+if RUN_MODE == "parse":
+    schedb = Schedb()
+    hostdb.run_database_server()
     partial_parse.concatenate_regblocks(pager, JSON_FILE, verbose=False)
-if BUILDING_SCHEDB:
     partial_parse.obs_main_populate_schedb(
         schedb, JSON_FILE, SCHEDB_FILE)
-
-if WRITING_LOCAL_DATABASE:  # Read the external database,
-    term_write_loop(pager, prompt=False)  # and write it to the local database.
-
-if DATABASE_IS_LOCAL:
     hostdb.close_database_server()  # Stop the database server.
-
-'''# This is the code I'm currently working on.
-
-depts = pager.get_json(pager.term)
-schedb.add_depts(depts)
-depts = [d["id"] for d in depts]  # save the abbreviations we'll need to loop on
-
-for dept in depts:
-    courses = pager.get_json(pager.term, dept)
-    coursnums = [course["number"] for course in courses]
-    # Do a hell of a lot more in this loop - quite possible everything?
-#'''
