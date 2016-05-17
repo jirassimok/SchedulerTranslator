@@ -13,6 +13,7 @@ io/new_v1.1.schedb.
 """
 # Imports from libraries.
 import sys
+import argparse
 # Imports from project.
 from schedb.schedb import Schedb
 from fetch import Fetch
@@ -26,46 +27,48 @@ get - Saves data from a web database to the local database.
 parse - Parses data from the local database to a schedb.
 """
 
-IO_PATH = "io"
-# There are many better ways to do this, but this is not my top priority.
-if len(sys.argv)>1:  # If command line arguments found...
-    RUN_MODE = sys.argv[1]
-    if RUN_MODE == "parse":
-        sys.exit()
-    if len(sys.argv)>2:
-        hostdb.PORT = sys.argv[2]
-        PORT = sys.argv[2]
-        if len(sys.argv)>3:
-            hostdb.DATABASE_PATH = sys.argv[3]
-            if len(sys.argv)>4:
-                IO_PATH = sys.argv[4]
+parser = argparse.ArgumentParser(description="Retrieves and translates the new "
+                                 "Scheduler's database from "
+                                 "wpi.collegescheduler.com and writes it to a "
+                                 "local database, which can be translated into "
+                                 "the old scheduler's schedb xml format.")
+parser.add_argument('mode', choices=["get", "parse"],
+                    help='The run mode for the program. get creates a local'
+                         'database, while parse creates a schedb')
+parser.add_argument('--database', default="DATABASE",
+                    help='Path for the database (default: %(default)s)')
+parser.add_argument('--pwfile', help='A password file')
+parser.add_argument('-o', '--output', default="new.schedb",
+                    help='Path for the output file (default: %(default)s)')
+parser.add_argument('-p', '--port', type=int, default=8000,
+                    help='Port for the local database (default: %(default)s)')
 
-else:
-    raise Exception('No run mode specified.')
+args = parser.parse_args()
 
-IO_PATH = IO_PATH.rstrip("/")
-JSON_FILE = IO_PATH + "/regblockslist.json"
-SCHEDB_FILE = IO_PATH + "/new_v1.1.schedb"
+hostdb.PORT = args.port
+hostdb.DATABASE_PATH = args.database
+JSON_FILE = "regblockslist.json"
 
 # TODO: Make a version of Fetch.get that gets from the file system directly.*
 # This would allow unicode to be read much more nicely, I am fairly certain.
 
-if RUN_MODE != "get" and RUN_MODE != "parse":
-    raise Exception('Invalid run mode: "' + RUN_MODE + '"')
+if args.mode != "get" and args.mode != "parse":
+    raise Exception('Invalid run mode: "' + args.mode + '"')
 
-pager = Fetch(local=(RUN_MODE == "parse"), port=PORT)  # readfile=None
+pager = Fetch(local=(args.mode == "parse"), port=args.port,
+              readfile=args.pwfile)
 print("Pager initialized")
 # pager.set_terms("Fall%202016")
 pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
 
-if RUN_MODE == "get":
+if args.mode == "get":
     # Read the external database and write it to the local database.
     term_write_loop(pager, prompt=False)
 
-if RUN_MODE == "parse":
+if args.mode == "parse":
     schedb = Schedb()
     hostdb.run_database_server()
     partial_parse.concatenate_regblocks(pager, JSON_FILE, verbose=False)
     partial_parse.obs_main_populate_schedb(
-        schedb, JSON_FILE, SCHEDB_FILE)
+        schedb, JSON_FILE, args.output)
     hostdb.close_database_server()  # Stop the database server.
