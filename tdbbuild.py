@@ -26,7 +26,7 @@ import os
 from utility import maybe_print_now
 
 # The filename of the local database's directory relative to this directory.
-LOCAL_DATABASE = "../DATABASE/"
+LOCAL_DATABASE = "DATABASE/"
 DEFAULT_DIR = os.getcwd()
 
 

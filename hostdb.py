@@ -6,7 +6,7 @@ Date: 2016-04-12
 
 Status: File complete. Do not edit.
 
-Hosts the local schedule database at ../DATABASE on port 8000.
+Hosts the local schedule database at DATABASE on port 8000.
 
 This file contains four constants, two functions, and a class.
 
@@ -17,7 +17,7 @@ PORT
     default 8000
     specifies the port the server will be hosted from
 DATABASE_PATH
-    default "../DATABASE"
+    default "DATABASE"
     the path to the database directory relative to BASE_DIR
 BASE_DIR
     the path to the starting directory at import time

@@ -7,8 +7,8 @@ Date: 2016-04-12
 
 Running this file will read all departments and courses in the local database
 (which must be running on port 8000) to a schedb, and print all the departments
-and regblocks in to ../io/regblockslist.json, then read that and write a schedb
-to ../io/new_v1.1.schedb.
+and regblocks in to io/regblockslist.json, then read that and write a schedb
+to io/new_v1.1.schedb.
 
 ONLY RUN THIS FILE IN "get" MODE.
 
@@ -28,7 +28,7 @@ get - Saves data from a web database to the local database.
 parse - Parses data from the local database to a schedb.
 """
 
-IO_PATH = "../io"
+IO_PATH = "io"
 # There are many better ways to do this, but this is not my top priority.
 if len(sys.argv)>1:  # If command line arguments found...
     RUN_MODE = sys.argv[1]

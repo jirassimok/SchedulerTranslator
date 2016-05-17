@@ -41,7 +41,7 @@ To transcribe the database to an xml:
 3. Run this code:
 >>> import hostdb
 >>> hostdb.PORT = 8001
->>> hostdb.DATABASE_PATH = "../DATABASE"  # set to the path to your database dir
+>>> hostdb.DATABASE_PATH = "DATABASE"  # set to the path to your database dir
 >>> hostdb.run_database_server()
 
 3. Run testing/testmain.py as follows, with FILEPATH being the path to testmain
@@ -72,7 +72,7 @@ To transcribe the database to an xml, run with:
 Main.py parse PORT DATABASE_PATH IO_PATH
 
 If not specified, PORT, DATABASE_PATH, and IO_PATH default to 8000,
-"../DATABASE", and "../io", respectively.
+"DATABASE", and "io", respectively.
 
 Run requirements:
     Both commands must be run from the code directory.
