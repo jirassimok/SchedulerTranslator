@@ -42,6 +42,10 @@ parser.add_argument('-o', '--output', default="new.schedb",
                     help='Path for the output file (default: %(default)s)')
 parser.add_argument('-p', '--port', type=int, default=8000,
                     help='Port for the local database (default: %(default)s)')
+parser.add_argument('--prompt', action='store_true',
+                    help='Prompt often (default: %(default)s)')
+parser.add_argument('--verbose', action='store_true',
+                    help='Print extra information (default: %(default)s)')
 
 args = parser.parse_args()
 
@@ -63,12 +67,12 @@ pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
 
 if args.mode == "get":
     # Read the external database and write it to the local database.
-    term_write_loop(pager, prompt=False)
+    term_write_loop(pager, prompt=args.prompt, verbose=args.verbose)
 
 if args.mode == "parse":
     schedb = Schedb()
     hostdb.run_database_server()
-    partial_parse.concatenate_regblocks(pager, JSON_FILE, verbose=False)
+    partial_parse.concatenate_regblocks(pager, JSON_FILE, verbose=args.verbose)
     partial_parse.obs_main_populate_schedb(
         schedb, JSON_FILE, args.output)
     hostdb.close_database_server()  # Stop the database server.
