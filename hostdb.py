@@ -63,9 +63,9 @@ def run_database_server(*, verbose=True):
     @param verbose: Specifies if the function should print values.
     """
     global SERVER, DATABASE_PATH
-    if not DATABASE_PATH or os.path.isdir(DATABASE_PATH):
-        raise NotADirectoryError("No database specified, or database does not"
-                                 "exist or is not a directory.")
+    if not (DATABASE_PATH or os.path.isdir(DATABASE_PATH)):
+         raise NotADirectoryError("No database specified, or database does not"
+                                 " exist or is not a directory.")
 
     try:
         os.chdir(DATABASE_PATH)
