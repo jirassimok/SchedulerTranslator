@@ -33,7 +33,7 @@ class Fetch(object):
         self.session = None  # Placeholder
 
         if not local:
-            self.url = "https://wpi.collegescheduler.com/api/terms"
+            self.url = "https://wpi.collegescheduler.com/api/"
             if readfile:
                 with open(readfile) as f:
                     sid = f.readline()[:-1]
@@ -43,7 +43,7 @@ class Fetch(object):
                 pin = getpass.getpass("password:")
             self.start_session(sid, pin)
         else:  # if local
-            self.url = "http://localhost:" + str(port) + "/terms"
+            self.url = "http://localhost:" + str(port) + "/"
 
     def start_session(self, sid, pin):
         """ Creates a valid scheduler session by logging in to bannerweb and
@@ -147,33 +147,38 @@ class Fetch(object):
         self.termlist = list(termset)
         self.term = self.termlist[0]
 
-    def get(self, term=None, dept=None, num=None,
-            *, rb=True, clean=False, delay=0):
+    def create_path(self, term, dept=None, num=None, rb=True):
+        """Assembles a path for a file from the parts
+
+        @param term: The term to get. As last, this will fetch the term list.
+        @param dept: The department to get. As last, will fetch course list.
+        @param num: The course's number. As last, will fetch course information.
+        @param rb: If true, the course's registration blocks will be fetched.
+        @return the path
+        """
+        target = "/terms/" + term + "/subjects"
+        if dept:
+            target += "/" + dept + "/courses"
+            if num:
+                target += "/" + str(num)
+                if rb:
+                    target += "/regblocks"
+        target += ".json" if self.hosting_locally else ""
+        return target
+
+    def get(self, path, clean=False, delay=0):
         """ Gets a page based on the arguments.
 
         Depending on how many arguments are given, different pages will be
         retrieved.
         In standard use, self.term should be passed as term.
 
-        @param term: The term to get. As last, this will fetch the term list.
-        @param dept: The department to get. As last, will fetch course list.
-        @param num: The course's number. As last, will fetch course information.
-        @param rb: If true, the course's registration blocks will be fetched.
         @param clean: If false, the data will not be cleaned for schedb parsing.
         @param delay: How long to wait before fetching the page.
         @return: The retrieved page.
         """
         time.sleep(delay)
-        target = self.url
-        if term:
-            target += "/" + term + "/subjects"
-            if dept:
-                target += "/" + dept + "/courses"
-                if num:
-                    target += "/" + str(num)
-                    if rb:
-                        target += "/regblocks"
-        target += ".json" if self.hosting_locally else ""
+        target = self.url + path
         # print(target)
         if self.hosting_locally:
             response = requests.get(target)
@@ -186,8 +191,8 @@ class Fetch(object):
         # print('\n', target, '\n', page)
         return page
 
-    def get_json(self, term=None, dept=None, num=None, rb=True):
-        return json.loads(self.get(term, dept, num, rb=rb, clean=False))
+    def get_json(self, path):
+        return json.loads(self.get(path, clean=False))
 
     # def set_page(self, term=None, dept=None, num=None, rb=False,
     #              *, clean=False):

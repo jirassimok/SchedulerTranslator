@@ -33,7 +33,7 @@ def concatenate_regblocks(pager, output_file, verbose=True):
     for term in pager.termlist:
         # Get departments for the term
         maybe_print_now(verbose, "\nReading term ", term, "...", sep='', end='')
-        depts = pager.get(term)
+        depts = pager.get(pager.create_path(term))
         deptabbrevs = {d["id"] for d in json_loads(depts)}
         departments.union(depts)
         maybe_print_now(verbose, " Success\n")
@@ -42,7 +42,8 @@ def concatenate_regblocks(pager, output_file, verbose=True):
         for dept in deptabbrevs:
             maybe_print_now(verbose, "Reading dept ", dept, "...",
                             sep='', end='')
-            courses = [crs["number"] for crs in pager.get_json(term, dept)]
+            courses = [crs["number"] for crs in
+                       pager.get_json(pager.create_path(term, dept))]
             maybe_print_now(verbose, " Success")
             for cnum in courses:
                 # maybe_print_now(True, dept, cnum)
@@ -55,7 +56,8 @@ def concatenate_regblocks(pager, output_file, verbose=True):
                 maybe_print_now(verbose, "\tFetching", dept + cnum,
                                 "regblocks...", end='')
                 # maybe_print_now(True, cnum)
-                courseregblocks = pager.get(term, dept, cnum, rb=True)
+                courseregblocks = pager.get(
+                    pager.create_path(term, dept, cnum, rb=True))
                 regblocks.append(courseregblocks)
                 maybe_print_now(verbose, " Success")
     # ',\n' would be better for joining regblocks, but I'm done with this file.
