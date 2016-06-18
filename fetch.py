@@ -11,11 +11,11 @@ Program to get WPI Course Planner pages as strings.
 Departments are stored as dictionaries in a list json.
 
 """
-import requests
 import re
 import time
 import json  # Probably should be using requests.Response.json() instead.
 import getpass
+import requests
 
 
 # TODO: Change local from a boolean to a base filepath for the database.

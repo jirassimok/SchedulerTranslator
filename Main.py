@@ -12,7 +12,6 @@ io/new_v1.1.schedb.
 
 """
 # Imports from libraries.
-import sys
 import argparse
 # Imports from project.
 from schedb.schedb import Schedb

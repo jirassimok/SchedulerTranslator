@@ -23,7 +23,6 @@ DATABASE/
                Season YEAR...
 """
 import os
-import sys
 from utility import maybe_print_now
 
 # The filename of the local database's directory relative to this directory.
