@@ -17,7 +17,6 @@ import argparse
 from schedb.schedb import Schedb
 from fetch import Fetch
 from dbbuild import DbBuilder  # Only needed to be run once for now.
-import hostdb
 
 """ RUN_MODE determines what this program will do. Possible values are:
 get - Saves data from a web database to the local database.
@@ -37,8 +36,6 @@ parser.add_argument('--database', default="DATABASE",
 parser.add_argument('--pwfile', help='A password file')
 parser.add_argument('-o', '--output', default="new.schedb",
                     help='Path for the output file (default: %(default)s)')
-parser.add_argument('-p', '--port', type=int, default=8000,
-                    help='Port for the local database (default: %(default)s)')
 parser.add_argument('--prompt', action='store_true',
                     help='Prompt often (default: %(default)s)')
 parser.add_argument('-v', '--verbose', action='store_true',
@@ -46,16 +43,13 @@ parser.add_argument('-v', '--verbose', action='store_true',
 
 args = parser.parse_args()
 
-hostdb.PORT = args.port
-hostdb.DATABASE_PATH = args.database
-
 # TODO: Make a version of Fetch.get that gets from the file system directly.*
 # This would allow unicode to be read much more nicely, I am fairly certain.
 
 if args.mode != "get" and args.mode != "parse":
     raise Exception('Invalid run mode: "' + args.mode + '"')
 
-pager = Fetch(local=(args.mode == "parse"), port=args.port,
+pager = Fetch(local=(args.database if args.mode == "parse" else None),
               readfile=args.pwfile)
 print("Pager initialized")
 # pager.set_terms("Fall%202016")
@@ -67,8 +61,6 @@ if args.mode == "get":
     dbbuilder.term_write_loop(args.prompt)
 
 if args.mode == "parse":
-    hostdb.run_database_server()
-    pager = Fetch(local=True, port=args.port)
     schedb = Schedb(pager.get_json(pager.create_path())) # initialize with terms
 
     for term in schedb.terms:
@@ -85,8 +77,6 @@ if args.mode == "parse":
                 regblocks = pager.get_json(pager.create_path(term, dept, number))
                 schedb.add_regblocks(regblocks, dept, number)
                 print("\t\t", dept, number, "processed.")
-
-    hostdb.close_database_server()
 
     with open(args.output, mode="w+") as file:
         file.write(str(schedb))

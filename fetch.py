@@ -22,17 +22,17 @@ import requests
 class Fetch(object):
     regblocks = True  # A constant for use as the "rb" parameter.
 
-    def __init__(self, *, readfile=None, local=False, port=8000):
+    def __init__(self, *, readfile=None, local=None):
         # self.page = None  # A page retrieved with set_page().
         self.term = ""  # The current term.
         self.termlist = []
 
-        # If hosting_locally is truthy, the page-fetching functions will add
+        # If local_db is truthy, the page-fetching functions will add
         # .json to the end of the appropriate URLs.
-        self.hosting_locally = local
+        self.local_db = local
         self.session = None  # Placeholder
 
-        if not local:
+        if local is None:
             self.url = "https://wpi.collegescheduler.com/api"
             if readfile:
                 with open(readfile) as f:
@@ -42,8 +42,6 @@ class Fetch(object):
                 sid = input("username:")
                 pin = getpass.getpass("password:")
             self.start_session(sid, pin)
-        else:  # if local
-            self.url = "http://localhost:" + str(port) + "/"
 
     def start_session(self, sid, pin):
         """ Creates a valid scheduler session by logging in to bannerweb and
@@ -53,7 +51,7 @@ class Fetch(object):
         @param pin: password
         @return: True if successful. None if hosting locally..
         """
-        if self.hosting_locally:  # Prevent large session initialization
+        if self.local_db is not None:  # Prevent large session initialization
             return None
         baseurl = "https://bannerweb.wpi.edu/pls/prod"
         urls = {
@@ -165,7 +163,7 @@ class Fetch(object):
                     target += "/" + str(num)
                     if rb:
                         target += "/regblocks"
-        target += ".json" if self.hosting_locally else ""
+        target += ".json" if self.local_db is not None else ""
         return target
 
     def get(self, path, clean=False, delay=0):
@@ -180,17 +178,16 @@ class Fetch(object):
         @return: The retrieved page.
         """
         time.sleep(delay)
-        target = self.url + path
-        # print(target)
-        if self.hosting_locally:
-            response = requests.get(target)
+        if self.local_db is not None:
+            with open(self.local_db + path) as file:
+                page = file.read()
         else:
+            target = self.url + path
             response = self.session.get(target)
-        response.raise_for_status()  # Error if request fails, None otherwise
-        page = response.text
+            response.raise_for_status()  # Error if request fails, None otherwise
+            page = response.text
         if clean:
             page = Fetch.clean_page(page)
-        # print('\n', target, '\n', page)
         return page
 
     def get_json(self, path):
