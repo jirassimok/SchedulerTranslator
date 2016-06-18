@@ -36,8 +36,8 @@ class Fetch(object):
             self.url = "https://wpi.collegescheduler.com/api"
             if readfile:
                 with open(readfile) as f:
-                    sid = f.readline()[:-1]
-                    pin = f.readline()[:-1]
+                    sid = f.readline().strip()
+                    pin = f.readline().strip()
             else:
                 sid = input("username:")
                 pin = getpass.getpass("password:")
