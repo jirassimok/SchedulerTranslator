@@ -22,3 +22,5 @@ not_in_git/*
 *~
 \#*#
 *.command
+/*.schedb
+/pwfile.txt
