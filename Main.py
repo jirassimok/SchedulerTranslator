@@ -16,7 +16,7 @@ import argparse
 # Imports from project.
 from schedb.schedb import Schedb
 from fetch import Fetch
-from tdbbuild import term_write_loop  # Only needed to be run once for now.
+from dbbuild import DbBuilder  # Only needed to be run once for now.
 import hostdb
 
 """ RUN_MODE determines what this program will do. Possible values are:
@@ -63,7 +63,8 @@ pager.set_terms("Fall%202016", "Summer%202016", "Spring%202017")
 
 if args.mode == "get":
     # Read the external database and write it to the local database.
-    term_write_loop(pager, prompt=args.prompt, verbose=args.verbose)
+    dbbuilder = DbBuilder(pager, args.database, args.verbose)
+    dbbuilder.term_write_loop(args.prompt)
 
 if args.mode == "parse":
     hostdb.run_database_server()
