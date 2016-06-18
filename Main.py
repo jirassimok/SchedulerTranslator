@@ -42,7 +42,7 @@ parser.add_argument('-p', '--port', type=int, default=8000,
                     help='Port for the local database (default: %(default)s)')
 parser.add_argument('--prompt', action='store_true',
                     help='Prompt often (default: %(default)s)')
-parser.add_argument('--verbose', action='store_true',
+parser.add_argument('-v', '--verbose', action='store_true',
                     help='Print extra information (default: %(default)s)')
 
 args = parser.parse_args()
