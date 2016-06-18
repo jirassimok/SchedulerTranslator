@@ -33,7 +33,7 @@ class Fetch(object):
         self.session = None  # Placeholder
 
         if not local:
-            self.url = "https://wpi.collegescheduler.com/api/"
+            self.url = "https://wpi.collegescheduler.com/api"
             if readfile:
                 with open(readfile) as f:
                     sid = f.readline()[:-1]
@@ -147,7 +147,7 @@ class Fetch(object):
         self.termlist = list(termset)
         self.term = self.termlist[0]
 
-    def create_path(self, term, dept=None, num=None, rb=True):
+    def create_path(self, term=None, dept=None, num=None, rb=True):
         """Assembles a path for a file from the parts
 
         @param term: The term to get. As last, this will fetch the term list.
@@ -156,13 +156,15 @@ class Fetch(object):
         @param rb: If true, the course's registration blocks will be fetched.
         @return the path
         """
-        target = "/terms/" + term + "/subjects"
-        if dept:
-            target += "/" + dept + "/courses"
-            if num:
-                target += "/" + str(num)
-                if rb:
-                    target += "/regblocks"
+        target = "/terms"
+        if term:
+            target += "/" + term + "/subjects"
+            if dept:
+                target += "/" + dept + "/courses"
+                if num:
+                    target += "/" + str(num)
+                    if rb:
+                        target += "/regblocks"
         target += ".json" if self.hosting_locally else ""
         return target
 

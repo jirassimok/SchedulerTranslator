@@ -108,6 +108,7 @@ def write_term(pager, term, *, cinfo=False,
     maybe_print_now(verbose, "Term", term, "complete\n\n")
 
 def term_write_loop(pager, *, prompt=True, verbose=True):
+    write_page(pager) # write terms.json
     for term in pager.termlist:
         if prompt and input("About to fetch term {}.\n".format(term) +
                             "Enter anything to skip.\n"):
