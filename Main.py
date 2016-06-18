@@ -18,9 +18,7 @@ import argparse
 from schedb.schedb import Schedb
 from fetch import Fetch
 from tdbbuild import term_write_loop  # Only needed to be run once for now.
-import partial_parse
 import hostdb
-# import utility
 
 """ RUN_MODE determines what this program will do. Possible values are:
 get - Saves data from a web database to the local database.
@@ -51,7 +49,6 @@ args = parser.parse_args()
 
 hostdb.PORT = args.port
 hostdb.DATABASE_PATH = args.database
-JSON_FILE = "regblockslist.json"
 
 # TODO: Make a version of Fetch.get that gets from the file system directly.*
 # This would allow unicode to be read much more nicely, I am fairly certain.
@@ -70,9 +67,26 @@ if args.mode == "get":
     term_write_loop(pager, prompt=args.prompt, verbose=args.verbose)
 
 if args.mode == "parse":
-    schedb = Schedb()
     hostdb.run_database_server()
-    partial_parse.concatenate_regblocks(pager, JSON_FILE, verbose=args.verbose)
-    partial_parse.obs_main_populate_schedb(
-        schedb, JSON_FILE, args.output)
-    hostdb.close_database_server()  # Stop the database server.
+    pager = Fetch(local=True, port=args.port)
+    schedb = Schedb(pager.get_json(pager.create_path())) # initialize with terms
+
+    for term in schedb.terms:
+        depts = pager.get_json(pager.create_path(term))
+        schedb.add_depts(depts)
+        print("Term", term, "deptartments added.")
+        for deptjson in depts:
+            dept = deptjson["id"]
+            courselist = pager.get_json(pager.create_path(term, dept))
+            schedb.add_courses_to_dept(courselist, dept)
+            print("\tDept", dept, "courses added.")
+            for course in courselist:
+                number = course["number"]
+                regblocks = pager.get_json(pager.create_path(term, dept, number))
+                schedb.add_regblocks(regblocks, dept, number)
+                print("\t\t", dept, number, "processed.")
+
+    hostdb.close_database_server()
+
+    with open(args.output, mode="w+") as file:
+        file.write(str(schedb))
