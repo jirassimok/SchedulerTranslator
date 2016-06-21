@@ -33,6 +33,7 @@ class DbBuilder(object):
         self.pager = pager
         self.database = database
         self.verbose = verbose
+        self.delay = delay
 
     def get_coursenums(self, term, dept):
         """ Returns a list of the course numbers for the given department.
@@ -44,46 +45,43 @@ class DbBuilder(object):
 
 
     def write_page(self, term=None, dept=None, num=None,
-                   *, regblocks=True, delay=0.0):
+                   *, regblocks=True):
         """ Gets and writes a page to a file.
 
         @param term: The term to get data for. As last, will fetch dept list.
         @param dept: The department to get. As last, will fetch course list.
         @param num: The course's number. As last, will fetch course information.
         @param regblock: If true, the course's registration blocks will be fetched.
-        @param delay: How long to wait before getting the page.
         """
         # Build the filepath the same way Fetch.get builds a url.
         path = self.pager.create_path(term, dept, num, regblocks)
         # Get the page.
         # print("Fetching:", path)
-        page = self.pager.get(path, delay=delay)
         # Write it to the file.
         filepath = self.database + path.replace("%20", " ") + ".json"
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         with open(filepath, "w+") as file:
             file.write(page)
 
-    def write_dept(self, term, dept, *, cinfo=False,
-                   delay=0.0):
+        page = self.pager.get(path, delay=self.delay)
+    def write_dept(self, term, deptid, cinfo=False):
         """ Writes the course listings, details, and regblocks for the given
         department to the files in the test database.
         @param term: The term to fetch data for.
         @param dept: The department to fetch data for.
         @param cinfo: Indicates whether course info besides regblocks is desired.
-        @param delay: How long to wait between requests.
         """
         maybe_print_now(self.verbose, "Fetching course listings for " + dept + "...",
                         sep='', end='')
         # Write course listings
-        self.write_page(term, dept, delay=0)
+        self.write_page(term, dept)
         maybe_print_now(self.verbose, "\tSuccess")
         coursenums = self.get_coursenums(term, dept)
         for cnum in coursenums:
             maybe_print_now(self.verbose, "\tFetching " + dept + cnum + " Regblocks...",
                             sep='', end='')
             # Write regblocks
-            self.write_page(term, dept, cnum, delay=delay)
+            self.write_page(term, dept, cnum)
             maybe_print_now(self.verbose, "\tSuccess")
             if cinfo:
                 maybe_print_now(self.verbose, "\t\tCourse info...", end='')
@@ -102,7 +100,7 @@ class DbBuilder(object):
         depts = self.pager.get_json(self.pager.create_path(term))  # Get dept listings for term.
         depts = [d["id"] for d in depts]  # save the abbrevs we'll need to loop on
         for dept in depts:
-            self.write_dept(term, dept, cinfo=cinfo, delay=0.0)
+            self.write_dept(term, deptid, cinfo=cinfo)
         maybe_print_now(self.verbose, "Term", term, "complete\n\n")
 
     def term_write_loop(self, prompt=True):
