@@ -63,6 +63,9 @@ class DbBuilder(object):
             with open(filepath, "w+") as file:
                 file.write(page)
 
+        if not self.verbose:
+            print('.', end='', flush=True)
+
         return json.loads(page)
 
     def get_course(self, term, deptid, cnum, cinfo=False):
