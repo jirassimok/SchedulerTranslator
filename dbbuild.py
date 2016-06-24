@@ -23,7 +23,6 @@ DATABASE/
                Season YEAR...
 """
 import os
-from utility import maybe_print_now
 import json
 
 # The filename of the local database's directory relative to this directory.
@@ -39,6 +38,11 @@ class DbBuilder(object):
         self.parsing = parsing
         self.verbose = verbose
         self.delay = delay
+
+    def vprint(self, *args, **kwargs):
+        """ Prints the arguments immediately if self.verbose is true. """
+        if self.verbose:
+            print(*args, **kwargs, flush=True)
 
     def get_page(self, term=None, dept=None, num=None, regblocks=True):
         """ Gets and writes a page to a file.
@@ -69,13 +73,12 @@ class DbBuilder(object):
         @param cnum: The course to fetch data for.
         @param cinfo: Indicates whether course info besides regblocks is desired.
         """
-        maybe_print_now(self.verbose,
-                        "\tFetching {}{} Regblocks...".format(deptid, cnum))
+        self.vprint("\tFetching {}{} Regblocks...".format(deptid, cnum))
         regblocks = self.get_page(term, deptid, cnum) # Write regblocks
         if self.parsing:
             self.schedb.add_regblocks(regblocks, deptid, cnum)
         if cinfo: # Write course details
-            maybe_print_now(self.verbose, "\t\tCourse info...", end='')
+            self.vprint("\t\tCourse info...", end='')
             self.get_page(term, deptid, cnum, regblocks=False)
 
     def get_dept(self, term, deptid, cinfo=False):
@@ -85,7 +88,7 @@ class DbBuilder(object):
         @param dept: The department to fetch data for.
         @param cinfo: Indicates whether course info besides regblocks is desired.
         """
-        maybe_print_now(self.verbose, "Fetching course listings for " + deptid)
+        self.vprint("Fetching course listings for " + deptid)
         courses = self.get_page(term, deptid) # Write course listings
         if self.parsing:
             self.schedb.add_courses_to_dept(courses, deptid)
@@ -99,14 +102,14 @@ class DbBuilder(object):
         @param term: The term to fetch.
         @param cinfo: Indicates whether course info besides regblocks is desired.
         """
-        maybe_print_now(self.verbose, "\nFetching term ", term)
+        self.vprint("\nFetching term ", term)
         depts = self.get_page(term)
         if self.parsing:
             self.schedb.add_depts(depts)
 
         for dept in depts:
             self.get_dept(term, dept["id"], cinfo=cinfo)
-        maybe_print_now(self.verbose, "Term", term, "complete\n\n")
+        self.vprint("Term", term, "complete\n\n")
 
     def get_all_terms(self, prompt=True):
         """ Gets all the departments in a term and adds them to the local database.
