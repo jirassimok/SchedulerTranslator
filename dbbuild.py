@@ -41,8 +41,7 @@ class DbBuilder(object):
 
     def vprint(self, *args, **kwargs):
         """ Prints the arguments immediately if self.verbose is true. """
-        if self.verbose:
-            print(*args, **kwargs, flush=True)
+        print(*args, **kwargs, flush=self.verbose)
 
     def get_page(self, term=None, dept=None, num=None, regblocks=True):
         """ Gets and writes a page to a file.
