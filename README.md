@@ -24,7 +24,6 @@ Only the mode (get/parse) is required, but there are several other arguments. So
 ## TODO ##
 
   * [ ] Run from parent directory, so this can be a child of the real scheduler.
-  * [ ] Remove utility.py.
 
 
 Changes to old Scheduler required to make new data work fully:
