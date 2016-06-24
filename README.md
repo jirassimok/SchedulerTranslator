@@ -5,21 +5,19 @@ Retrieves and translates the new Scheduler's database from wpi.collegescheduler.
 Current version: 2.0
 
 ## Usage ##
-Main.py has two modes: `get` and `parse`. `get` will build a local copy of the collegescheduler database, while `parse` will use that database to create the schedb xml file.
+Usage information can be found with `-h` or `--help`. With no arguments, it will ask for username and password, then fetch and parse the database. Arguments are shown below:
 
-### Arguments ###
-Only the mode (get/parse) is required, but there are several other arguments. Some arguments are only used in one mode. The table below shows which arguments function in which modes.
-
-| Argument          | Function                    | Mode  |
-|-------------------|-----------------------------|-------|
-| `--database`      | Path for the database       | both  |
-| `--pwfile`        | A password file             | get   |
-| `-o`, `--output`  | Path for the output file    | parse |
-| `-p`, `--port`    | Port for the local database | parse |
-| `--prompt`        | Prompt often                | both  |
-| `-v`, `--verbose` | Print extra information     | both  |
-
-`--pwfile` takes a file with the username on one line, and the password on the next
+| Argument          | Function                                                           |
+|-------------------|--------------------------------------------------------------------|
+| `--database`      | Path for the database                                              |
+| `--pwfile`        | A password file (username on the first line, password on the next) |
+| `-o`, `--output`  | Path for the output file                                           |
+| `--prompt`        | Prompt often                                                       |
+| `-v`, `--verbose` | Print extra information                                            |
+| `-l`, `--local`   | Use the local database generated with `-g`                         |
+| `-g`, `--get`     | Generate a local database for use with `-l`                        |
+| `--no-parse`      | Don't parse the data. Implies `-g`                                 |
+|                   |                                                                    |
 
 ## TODO ##
 

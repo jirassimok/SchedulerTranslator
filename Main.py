@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(description="Retrieves and translates the new "
                                  "the old scheduler's schedb xml format.")
 parser.add_argument('--database', default="DATABASE",
                     help='Path for the database (default: %(default)s)')
-parser.add_argument('--pwfile', help='A password file')
+parser.add_argument('--pwfile', help='A password file (username on the first line, password on the next)')
 parser.add_argument('-o', '--output', default="new.schedb",
                     help='Path for the output file (default: %(default)s)')
 parser.add_argument('--prompt', action='store_true',
@@ -42,17 +42,16 @@ parser.add_argument('--no-parse', action='store_true',
 
 args = parser.parse_args()
 
-# TODO: Make a version of Fetch.get that gets from the file system directly.*
-# This would allow unicode to be read much more nicely, I am fairly certain.
-
 pager = Fetch(local=(args.database if args.local else None),
               readfile=args.pwfile)
 print("Pager initialized")
 pager.set_terms("Fall%202016", "Spring%202017")
 
 schedb = Schedb(pager.get_json(pager.create_path())) # initialize with terms
-dbbuilder = DbBuilder(pager, args.database, schedb, saving=args.get,
-                      parsing=(not args.no_parse), verbose=args.verbose,)
+dbbuilder = DbBuilder(pager, args.database, schedb,
+                      saving=args.get or args.no_parse,
+                      parsing=(not args.no_parse),
+                      verbose=args.verbose)
 dbbuilder.get_all_terms(args.prompt)
 
 if not args.no_parse:
