@@ -36,8 +36,7 @@ class Period(object):
         else:
             self.professor_email = "look@it.up"
 
-        # TODO: Concatenating CRN to room number isn't the best solution, but...
-        # it's the best I've got right now.
+        # TODO: Concatenating CRN to room number isn't the best solution, but it's the best I've got right now.
         location = meeting["location"].split(" ") + ([str(crn)] if crn else [])
         self.building = location[0]
         self.room = (" ".join(location[1:]) if location[2:] else "?")
@@ -66,7 +65,8 @@ class Period(object):
         stringlist = [str(s) for s in string]
         return ''.join(stringlist)
 
-    def fix_days(self, raw_days, default="wed"):
+    @staticmethod
+    def fix_days(raw_days):
         """ Parse a list of days in the format "MTWRF" into the format
         "mon,tue,wed,thu,fri".
 
@@ -83,7 +83,8 @@ class Period(object):
                 pass
         return ','.join(days)
 
-    def fix_time(self, time, *, default="12:00PM"):
+    @staticmethod
+    def fix_time(time, *, default="12:00PM"):
         """ Parse a time in "%H%M" format to "%I:%M%p" format.
 
         The default should always be specified.
