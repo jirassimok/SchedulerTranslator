@@ -1,26 +1,33 @@
-# The database need not be updated.
+# No program output should be included.
 /DATABASE/*
 /DATABASE*/*
-/io/*
+/*.schedb
 
-# The schedular need not be included
+
+# The Scheduler is not being worked on here.
+# Maybe remove this from .gitignore entirely.
 /Scheduler/*
 /war/*
 war.zip
 
-# Things explicitly not to include
-not_in_git/*
-/code/testing/*
-/TESTGROUNDS/*
+
+# Private files.
+/testing/*
+/pwfile.txt
+
+
+# Prefix for extraneous local files.
+/x_*/*
+
 
 # PyCharm directories
 **/__pycache__/*
 .idea/*
 
-# Files nobody else wants
+
+# OS/editor files that nobody wants.
 .DS_Store
 *~
 \#*#
 *.command
-/*.schedb
-/pwfile.txt
+
