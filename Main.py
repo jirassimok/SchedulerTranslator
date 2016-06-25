@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """ Main.py
 
+Author: Adam Goldsmith
 Author: Jacob Komissar
 
 Date: 2016-04-12
@@ -47,7 +48,7 @@ pager = Fetch(local=(args.database if args.local else None),
 print("Pager initialized")
 pager.set_terms("Fall%202016", "Spring%202017")
 
-schedb = Schedb(pager.get_json(pager.create_path())) # initialize with terms
+schedb = Schedb(pager.get_json(pager.create_path()))  # initialize with terms
 dbbuilder = DbBuilder(pager, args.database, schedb,
                       saving=args.get or args.no_parse,
                       parsing=(not args.no_parse),

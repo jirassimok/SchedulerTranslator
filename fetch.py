@@ -1,7 +1,7 @@
 """ jsonFetcher.py
 
-Author: Jacob Komissar
 Author: Adam Goldsmith
+Author: Jacob Komissar
 
 Date: 2016-04-09/10
 
@@ -107,7 +107,7 @@ class Fetch(object):
 
         # Ensure that only one token is good to use.
         # Only the final else should ever actually run.
-        if len(tokens)==0:
+        if len(tokens) == 0:
             raise Exception("Verification token not found"
                             "- could not get all courses")
             # TODO: Implement an option to ignore this error and proceed without full courses.
@@ -132,7 +132,6 @@ class Fetch(object):
                 'selected: true, code: "OpenAndFull"}')
 
         self.session.put(url, body, headers=headers)
-
 
     def set_terms(self, *termstrings):
         """ Sets the current term, and adds additional terms to termlist.
@@ -173,6 +172,7 @@ class Fetch(object):
         retrieved.
         In standard use, self.term should be passed as term.
 
+        @param path: The path to the page to get.
         @param clean: If false, the data will not be cleaned for schedb parsing.
         @param delay: How long to wait before fetching the page.
         @return: The retrieved page.
