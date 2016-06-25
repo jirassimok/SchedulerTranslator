@@ -1,13 +1,13 @@
-schedbparse
+schedb
 
-This module was intended to replace schedb in a cleaner, more object-oriented
-fashion. However, due to time constraints, it has been put on hold.
+This package contains five files (besdies this one and __init__.py), each
+containing a single class. Each class represents a level of the xml (schedb)
+file that the WPI Scheduler uses: schedb, dept, course, secction, and period.
 
-schedb.py currently contains the skeletons of the classes that represent the
-    database. These should not remain in one file.
+--------------------------------------------------------------------------------
 
 Below are various notes from the creation of this package.
-
+I'll remove them later.t
 
 
 DONE marks previous to-do items.
