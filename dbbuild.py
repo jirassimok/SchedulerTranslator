@@ -119,14 +119,15 @@ class DbBuilder(object):
             self.get_dept(term, dept["id"], cinfo=cinfo)
         self.vprint("Term", term, "complete\n\n")
 
-    def get_all_terms(self, prompt=True):
-        """ Gets all the departments in a term and adds them to the local database.
+    def get_all_terms(self, termlist, prompt=True):
+        """ Gets all of the courses in all of the terms in termlist
 
+        @param termlist A list of terms to get
         @param prompt Indicates whether the user should be asked before getting
                       each term..
         """
         self.get_page()  # write terms.json
-        for term in self.pager.termlist:
+        for term in termlist:
             if prompt and input("About to fetch term {}, "
                                 "enter anything to skip.\n".format(term)):
                 continue
