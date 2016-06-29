@@ -153,7 +153,7 @@ class Fetch(object):
         target += ".json" if self.local_db is not None else ""
         return target
 
-    def get(self, path, clean=False, delay=0):
+    def get(self, path, delay=0):
         """ Gets a page based on the arguments.
 
         Depending on how many arguments are given, different pages will be
@@ -173,25 +173,7 @@ class Fetch(object):
             response = self.session.get(target)
             response.raise_for_status()  # Error if request fails, None otherwise
             page = response.text
-        if clean:
-            page = Fetch.clean_page(page)
         return page
 
     def get_json(self, path):
-        return json.loads(self.get(path, clean=False))
-
-    # def set_page(self, term=None, dept=None, num=None, rb=False,
-    #              *, clean=False):
-    #     self.page = self.get(term, dept, num, rb, clean=clean)
-
-    # def set_json(self):
-    #     self.page = self.page.json()
-    #     # self.page = json.loads(self.page)
-
-    @staticmethod
-    def clean_page(page):
-        return (page.replace('<br />', ' ').replace('&', '&amp;')
-                .encode("ascii", errors="ignore").decode("ascii"))
-        # .replace("<", "&lt;")
-        # .replace('&', '&amp;')
-        # .replace(u"\u2019", "'")
+        return json.loads(self.get(path))
