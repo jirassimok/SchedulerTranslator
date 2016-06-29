@@ -24,8 +24,6 @@ class Fetch(object):
 
     def __init__(self, *, readfile=None, local=None):
         # self.page = None  # A page retrieved with set_page().
-        self.term = ""  # The current term.
-        self.termlist = []
 
         # If local_db is truthy, the page-fetching functions will add
         # .json to the end of the appropriate URLs.
@@ -133,16 +131,6 @@ class Fetch(object):
 
         self.session.put(url, body, headers=headers)
 
-    def set_terms(self, *termstrings):
-        """ Sets the current term, and adds additional terms to termlist.
-
-        If multiple termstrings are provided, self.term is not guaranteed to be
-        set to the first.
-        @param termstrings: Strings representing the terms.
-        """
-        termset = {term.strip("/") for term in termstrings}
-        self.termlist = list(termset)
-        self.term = self.termlist[0]
 
     def create_path(self, term=None, dept=None, num=None, rb=True):
         """Assembles a path for a file from the parts
@@ -170,7 +158,6 @@ class Fetch(object):
 
         Depending on how many arguments are given, different pages will be
         retrieved.
-        In standard use, self.term should be passed as term.
 
         @param path: The path to the page to get.
         @param clean: If false, the data will not be cleaned for schedb parsing.
