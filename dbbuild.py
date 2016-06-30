@@ -30,6 +30,8 @@ import json
 
 
 class DbBuilder(object):
+    total_courses = 0
+    courses_done = 0
 
     def __init__(self, pager, database, schedb, saving=False,
                  parsing=False, verbose=False, delay=0):
@@ -45,6 +47,17 @@ class DbBuilder(object):
         """ Prints the arguments immediately if self.verbose is true. """
         if self.verbose:
             print(*args, **kwargs, flush=True)
+
+    def print_progress(self):
+        if self.total_courses != 0:
+            length = 100 # length of the progress bar
+            percent = (self.courses_done / self.total_courses)
+            progress = int(length * percent)
+            pstring = '\r[{}] {}/{} {:.2f}%'.format(("#"*progress).ljust(length),
+                                                self.courses_done,
+                                                self.total_courses,
+                                                percent * 100)
+            print(pstring, end='', flush=True)
 
     def get_page(self, term=None, dept=None, num=None, regblocks=True):
         """ Gets and writes a page to a file.
@@ -65,8 +78,7 @@ class DbBuilder(object):
             with open(filepath, "w+") as file:
                 file.write(page)
 
-        if not self.verbose:
-            print('.', end='', flush=True)
+        self.print_progress()
 
         return json.loads(page)
 
@@ -86,6 +98,8 @@ class DbBuilder(object):
         if cinfo:  # Write course details
             self.vprint("\t\tCourse info...", end='')
             self.get_page(term, deptid, cnum, regblocks=False)
+
+        self.courses_done += 1
 
     def get_dept(self, term, deptid, cinfo=False):
         """ Writes the course listings, details, and regblocks for the given
@@ -114,6 +128,9 @@ class DbBuilder(object):
         depts = self.get_page(term)
         if self.parsing:
             self.schedb.add_depts(depts)
+
+
+        self.total_courses += sum([dept["courseCount"] for dept in depts])
 
         for dept in depts:
             self.get_dept(term, dept["id"], cinfo=cinfo)
