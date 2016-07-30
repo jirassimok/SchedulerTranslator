@@ -20,22 +20,23 @@ from .period import Period
 
 
 class Section(object):
-    def __init__(self, jsection=None):
+    def __init__(self, jsections):
         # Composite info
         self.numberlist = []  # Will store e.g. A01 for all subsections
         self.number = None  # Will store e.g. "A01 X02"
         self.periods = []
 
-        self.crn = None
-        self.term = None  # YEAR[SEMESTER]
-        self.partOfTerm = None  # X term
+        termtuple = self.fix_term(jsections[0]["partsOfTerm"])
+        self.term = termtuple[0]  # YEAR[SEMESTER]
+        self.partOfTerm = termtuple[1] # X term
+
+        self.crn = jsections[0]["id"]
         self.seats = None
         self.availableseats = None
         self.max_waitlist = None
         self.actual_waitlist = None
 
-        if jsection:
-            self.add_main_info(jsection)
+        for jsection in jsections: # Add meetings for all sections
             self.add_meetings(jsection)
 
     def __eq__(self, other):
@@ -98,29 +99,6 @@ class Section(object):
         self.number = ' '.join((num[1:] if len(num) > 3 else num)
                                for num in self.numberlist)
 
-    def add_main_info(self, jsection):
-        """ Fill out universal data in the section, which should be shared by
-        all of this object's periods.
-
-        @param jsection: The section json to read data from.
-        """
-        termtuple = self.fix_term(jsection["partsOfTerm"])
-        self.term = termtuple[0]
-        self.partOfTerm = termtuple[1]
-        # self.crn = jsection["id"]
-
-        # DONE Possibly switch to use crn from lab period - but which if more?
-        # TODO VERY IMPORTANT: Find a better way to store lab/conference CRNs...
-        # Issues:
-        # We could use the lab period CRN, which would work because we have the
-        # lectures also listed as seaprate courses, but this approach would fail
-        # for courses with both a lab and a conference, because those have 3
-        # CRNs, and we can only easily store one per period.
-        # The second option is to concatenate them WITHOUT SPACES to the main
-        # CRN. This would work all right, but would be a pain to read.
-
-        # print("SECTION DATA FOR", jsection["id"])
-
     def add_meetings(self, jsection):
         """ Parse a regblocks section into one or more periods and add them to
         this Section.
@@ -154,7 +132,6 @@ class Section(object):
         # Use the seats from the smallest subsection.
         seats = jsection["seatsCapacity"]
         if not self.seats or seats < self.seats:
-            self.crn = crn
             self.seats = str(jsection["seatsCapacity"])
             self.availableseats = str(jsection["openSeats"])
             self.max_waitlist = str(jsection["waitlist"])

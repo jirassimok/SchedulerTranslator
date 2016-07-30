@@ -79,90 +79,9 @@ class Course(object):
         jsections = {section["id"]: section for section in sections}
 
         for regblock in regblocks:  # A regblock is a list of crns.
-            self.add_section(regblock, jsections)
+            new_section = Section([jsections[crn] for crn in regblock])
+            if new_section not in self.sections:  # prevent duplicate sections
+                self.sections.append(new_section)
         self.sections.sort()  # put them in order - enabled by Section.__lt__()
 
         self.course_desc = sections[0]["description"]
-
-    def add_section(self, crns, jsections):
-        """ Parse a sections json and a list of CRNs into one of this course's
-        sections and its periods.
-
-        @param crns: A list of the crns in the section.
-        @param jsections: The sections in the regblocks json.
-        """
-        new_section = Section()
-        for crn in crns:
-            try:
-                jsection = jsections[crn]  # section is a regblocks[section]
-            except KeyError:
-                raise KeyError("Missing section: " + crn)
-
-            # if it's a lecture or missing any information
-            if len(jsection["sectionNumber"]) == 3:
-                # TODO: Find a better way to identify the main section.
-                # Possibilities:
-                #   use jsection["component"]=="Lecture"
-                # TODO: (maybe done) Fix bug causing incorrect information for main sections.
-                # Could split main section and add_main_info
-                new_section.add_main_info(jsection)  # add info to object
-                main_section = Section(jsection)
-                """ Might be better for consistency:
-                main_section = Section()
-                main_section.add_main_info(jsection)
-                main_section.add_meetings(jsection)
-                # and remove option to create Sections with jsection args,
-                # but see alternative forms, below
-                """
-                if main_section not in self.sections:
-                    self.sections.append(main_section)
-            new_section.add_meetings(jsection)
-
-        # Check if the section is correctly-populated first.
-        # TODO: this should cause a warning or error of some sort,
-        # rather than adding main info, because that might not be the problem.
-        if not new_section.is_valid():
-            new_section.add_main_info(jsections[crns[0]])
-
-        if new_section not in self.sections:  # prevent duplicate sections
-            self.sections.append(new_section)
-
-        # TODO: Consider the alternative forms.
-        """ ALTERNATIVE FORMS
-        1 would improve object-orientism, but would make identifying the main
-        section more difficult.
-
-        1.
-        Possible alternative form for add_section, using an expanded Section
-        initializer that parses a list of json sections:
-
-        relevant_sections = []
-        for crn in crns:
-            try:
-                relevant_sections.append(jsections[crn])
-            except KeyError:
-                raise KeyError("Missing section: " + crn)
-        new_section = Section(relevant_sections)
-
-        ... check validity ...
-        ... add new secction to self.sections if not present ...
-
-        2.
-        This would have to be accompanied by updates to both Section.__init__
-        and Course.add_regblocks.
-        Section.__init__ would have to loop over the given jsections and add
-        meetings. This would be a trivial change.
-
-        There would have to be another way to find the main sections.
-
-        I think the best way might be to use Course.add_regblocks to loop over
-        the list of regblock CRNs and counting occurences of each CRN.
-        Then they can be sorted into a number of groups equal to the number of
-        CRNs in each regblock, where all regblocks contain one CRN from each
-        group. From there, the main section may be identifiable.
-
-        This is much easier to do without implementing alternative form 1,
-        because Course.add_section can be used to return useful information for
-        identifying the main section.
-        """
-
