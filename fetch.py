@@ -166,7 +166,7 @@ class Fetch(object):
         """
         time.sleep(delay)
         if self.local_db is not None:
-            with open(self.local_db + path) as file:
+            with open(self.local_db + path.replace("%20", " ")) as file:
                 page = file.read()
         else:
             target = self.url + path
