@@ -46,7 +46,10 @@ args = parser.parse_args()
 pager = Fetch(local=(args.database if args.local else None),
               readfile=args.pwfile)
 print("Pager initialized")
-pager.set_terms("Fall%202016", "Spring%202017")
+if args.local:
+    pager.set_terms("Fall 2016", "Spring 2017")
+else:
+    pager.set_terms("Fall%202016", "Spring%202017")
 
 schedb = Schedb(pager.get_json(pager.create_path()))  # initialize with terms
 dbbuilder = DbBuilder(pager, args.database, schedb,
