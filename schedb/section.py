@@ -17,6 +17,7 @@ Where the schedb xml uses hyphens in attribute names, I use camelCase for the
 matching variables here.
 """
 from .period import Period
+import re # for dealing with section numbers
 
 
 class Section(object):
@@ -93,10 +94,69 @@ class Section(object):
 
     def fix_section_number(self):
         """ Concatenate lab and section numbers.
-        Probably should be part of or called from add_meetings. """
+
+        Called from add_meetings and the optional init.
+        The rules for creating full section numbers are as follows:
+
+        If any of the section's numbers beings with an A, B, C, or D followed by
+        two digits, that number becomes the main number. Numbers with no additional
+        characters are prioritized in this selection.
+
+        If a main number is found and all of the numbers begin with the same
+        character, that character will be removed from the beginning of every
+        number besides the main number.
+
+        The main number is placed before the other numbers, which are organized
+        alphabetically.
+
+        If no main number is found or the numbers begin with different characters,
+        the numbers will be placed in alphabetical order.
+        """
         self.numberlist.sort()  # should always be sorted anyway
-        self.number = ' '.join((num[1:] if len(num) > 3 else num)
-                               for num in self.numberlist)
+        # obsolete version, replaces everything below it
+        #self.number = ' '.join((num[1:] if len(num) > 3 else num)
+        #                       for num in self.numberlist)
+        self.count += 1
+        for number in self.numberlist:
+            if re.match(r'^[ABCD][0-9][0-9]$', number):
+                break
+        else:  # if no ideal main number was found, try numbers with extra ends
+            for number in self.numberlist:
+                if re.match(r'^[ABCD][0-9][0-9]', number):
+                    break
+            else:
+                number = None
+
+        # if a main section was determined and all numbers start with the same letter
+        if number and all((num.startswith(number[0]) for num in self.numberlist)):
+            # put the main section at the start and remove the first letter of each other section
+            self.numberlist = [num[(1 if len(num)>3 else 0):] for num in self.numberlist if (not (num == number))]
+            self.numberlist.insert(0, number)
+
+        self.number = ' '.join(self.numberlist)
+
+        """
+        To deal with unusual section numbers, follow these rules;
+        Section number [ABCD][0-9][0-9] is assumed to be the main section if present.
+        Otherwise, a section starting with that pattern is the main secction, if present.
+        Otherwise, all sections are presented in alphabetical order.
+
+        If a main section is present, all other sections have the first letter of that section removed from their number,
+        unless only some can, in which case none do.
+
+
+        If exactly one main number is present,
+            Use it.
+        If multiple main numbers are present,
+            Use all numbers directly.
+        If no main numbers are present,
+            If a near-main number is present...
+            If multiple...
+            If no near-main numbers are present,
+                Use all numbers directly.
+
+
+        """
 
     def add_main_info(self, jsection):
         """ Fill out universal data in the section, which should be shared by
