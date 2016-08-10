@@ -186,16 +186,11 @@ class Section(object):
 
         self.numberlist.append(jsection["sectionNumber"])
         self.numberlist.sort()
-        # TODO: This should modify more of own properties.
-        # So far, this properly constructs a period. It still needs to update
-        # this section's (available)seats and waitlists.
 
         # Use the seats from the smallest subsection.
-        # TODO: IMPORTANT. Deal with classes with both a lab and a conference.
-        # Possibly track sizes of both by padding to longer size and concatenating as strings.
-        seats = jsection["seatsCapacity"]
-        if not self.seats or seats < self.seats:
+        if self.seats is None or int(jsection["seatsCapacity"]) < int(self.seats):
             self.seats = str(jsection["seatsCapacity"])
             self.availableseats = str(jsection["openSeats"])
-            self.max_waitlist = str(jsection["waitlist"])
+            self.max_waitlist = str(int(jsection["waitlist"])
+                                    + int(jsection["waitlistOpen"]))
             self.actual_waitlist = str(jsection["waitlistOpen"])
