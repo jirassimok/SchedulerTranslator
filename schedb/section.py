@@ -38,6 +38,7 @@ class Section(object):
         if jsection:
             self.add_main_info(jsection)
             self.add_meetings(jsection)
+        self.fix_section_number()
 
     def __eq__(self, other):
         """ Sections are equal if they have the same section numbers.
@@ -49,8 +50,10 @@ class Section(object):
         """ A section is less than another if its number is lower.
         @raise TypeError if other is not a Section.
         """
-        if isinstance(other, Section):
+        if isinstance(other, Section) and other.number is not None and self.number is not None:
             return self.number < other.number
+        elif isinstance(other, Section):
+            raise AttributeError("Sections without numbers are unorderable.")
         else:
             return not self > other  # bad shortcut to unorderable TypeError
 
@@ -206,12 +209,13 @@ class Section(object):
 
         self.numberlist.append(jsection["sectionNumber"])
         self.numberlist.sort()
-        self.fix_section_number()
         # TODO: This should modify more of own properties.
         # So far, this properly constructs a period. It still needs to update
         # this section's (available)seats and waitlists.
 
         # Use the seats from the smallest subsection.
+        # TODO: IMPORTANT. Deal with classes with both a lab and a conference.
+        # Possibly track sizes of both by padding to longer size and concatenating as strings.
         seats = jsection["seatsCapacity"]
         if not self.seats or seats < self.seats:
             self.crn = crn

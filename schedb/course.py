@@ -99,7 +99,7 @@ class Course(object):
                 raise KeyError("Missing section: " + crn)
 
             # if it's a lecture or missing any information
-            if len(jsection["sectionNumber"]) == 3:
+            if len(jsection["sectionNumber"]) == 3 or jsection["component"] == "Lecture":
                 # TODO: Find a better way to identify the main section.
                 # Possibilities:
                 #   use jsection["component"]=="Lecture"
@@ -124,6 +124,7 @@ class Course(object):
         if not new_section.is_valid():
             new_section.add_main_info(jsections[crns[0]])
 
+        new_section.fix_section_number()
         if new_section not in self.sections:  # prevent duplicate sections
             self.sections.append(new_section)
 
@@ -165,4 +166,3 @@ class Course(object):
         because Course.add_section can be used to return useful information for
         identifying the main section.
         """
-
