@@ -25,6 +25,7 @@ DATABASE/
 """
 import os
 import json
+from concurrent import futures
 
 # The filename of the local database's directory relative to this directory.
 
@@ -34,7 +35,7 @@ class DbBuilder(object):
     courses_done = 0
 
     def __init__(self, pager, database, schedb, saving=False,
-                 parsing=False, verbose=False, delay=0):
+                 parsing=False, verbose=0, workers=10, delay=0):
         self.pager = pager
         self.database = database
         self.schedb = schedb
@@ -42,6 +43,7 @@ class DbBuilder(object):
         self.parsing = parsing
         self.verbose = verbose
         self.delay = delay
+        self.executor = futures.ThreadPoolExecutor(max_workers=workers)
 
     def vprint(self, *args, **kwargs):
         """ Prints the arguments immediately if self.verbose is true. """
@@ -116,7 +118,7 @@ class DbBuilder(object):
 
         for course in courses:
             cnum = course["number"]
-            self.get_course(term, deptid, cnum, cinfo)
+            self.executor.submit(self.get_course, term, deptid, cnum, cinfo)
 
     def get_term(self, term, cinfo=False):
         """ Gets all the departments in a term and adds them to the local database.

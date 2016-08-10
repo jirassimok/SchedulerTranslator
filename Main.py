@@ -37,6 +37,8 @@ parser.add_argument('-l', '--local', action='store_true',
                     help='Use the local database generated with "-g" (default: %(default)s)')
 parser.add_argument('-g', '--get', action='store_true',
                     help='Generate a local database for use with "-l" (default: %(default)s)')
+parser.add_argument('-w', '--workers', default=10,
+                    help='The number of workers to use for parallel downloading (default: %(default)s)')
 parser.add_argument('--no-parse', action='store_true',
                     help='Don\'t parse the data. Implies "-g" (default: %(default)s)')
 
@@ -51,7 +53,8 @@ schedb = Schedb(pager.get_json(pager.create_path()))  # initialize with terms
 dbbuilder = DbBuilder(pager, args.database, schedb,
                       saving=args.get or args.no_parse,
                       parsing=(not args.no_parse),
-                      verbose=args.verbose)
+                      verbose=args.verbose,
+                      workers=int(args.workers))
 dbbuilder.get_all_terms(["Fall%202016", "Spring%202017"], args.prompt)
 
 if not args.no_parse:
